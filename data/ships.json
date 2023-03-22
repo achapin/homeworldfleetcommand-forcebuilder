@@ -2,109 +2,158 @@
     {
         "name":"mothership",
         "class":"super-capital",
-        "faction":"kushan",
-        "cost":7
+        "faction":["kushan"],
+        "cost":7,
+        "slots": [
+            {
+                "class":"interceptor",
+                "purchase":"free"
+            },
+            {
+                "class":"interceptor",
+                "purchase":"optional"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 4
+            }
+        ]
     },
     {
         "name":"ion-cannon-frigate",
         "class":"frigate",
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":4
     },
     {
         "name":"interceptor",
         "class":"fighter",
-        "faction":"kushan",
+        "faction":["kushan", "taiidan"],
         "cost":3
     },
     {
         "name":"heavy-corvette",
         "class":"corvette",
-        "faction":"kushan",
-        "cost":3
-    },
-    {
-        "name":"heavy-corvette",
-        "class":"corvette",
-        "faction":"taiidan",
+        "faction":["kushan","taiidan"],
         "cost":3
     },
     {
         "name":"attack-bomber",
         "class":"fighter",
-        "faction":"kushan",
+        "faction":["kushan", "taiidan"],
         "cost":3
     },
     {
         "name":"assault-frigate",
         "class":"frigate",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":5
-    },
-    {
-        "name":"destroyer",
-        "class":"super-capital",
-        "faction":"taiidan",
-        "cost":7
-    },
-    {
-        "name":"destroyer",
-        "class":"super-capital",
-        "faction":"kushan",
-        "cost":7
-    },
-    {
-        "name":"ion-cannon-frigate",
-        "class":"frigate",
-        "faction":"taiidan",
-        "cost":4
     },
     {
         "name":"carrier",
         "class":"super-capital",
-        "faction":"taiidan",
-        "cost":5
-    },
-    {
-        "name":"interceptor",
-        "class":"fighter",
-        "faction":"taiidan",
-        "cost":3
+        "faction":["kushan", "taiidan"],
+        "cost":5,
+        "slots": [
+            {
+                "class":"interceptor",
+                "purchase":"free"
+            },
+            {
+                "class":"interceptor",
+                "purchase":"optional"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 2
+            }
+        ]
     },
     {
         "name":"salvage-corvette",
         "class":"corvette",
-        "faction":"kushan",
-        "cost":2
-    },
-    {
-        "name":"salvage-corvette",
-        "class":"corvette",
-        "faction":"taiidan",
+        "faction":["kushan","taiidan"],
         "cost":2
     },
     {
         "name":"space-station",
         "class":"station",
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":5
     },
     {
         "name":"weapons-platform",
         "class":"platform",
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":3
     },
     {
         "name":"scout",
         "class":"fighter",
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":2
     },
     {
-        "name":"carrier",
+        "name":"drone-frigate",
+        "class":"frigate",
+        "faction":["kushan"],
+        "cost":4
+    },
+    {
+        "name":"field-frigate",
+        "class":"frigate",
+        "faction":["taiidan"],
+        "cost":4
+    },
+    {
+        "name":"defender",
+        "class":"fighter",
+        "faction":["kushan","taiidan"],
+        "cost":2
+    },
+    {
+        "name":"multi-gun-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":4
+    },
+    {
+        "name":"light-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":2
+    },
+    {
+        "name":"missile-destroyer",
         "class":"super-capital",
-        "faction":"kushan",
-        "cost":5
+        "faction":["kushan","taiidan"],
+        "cost":6
+    },
+    {
+        "name":"destroyer",
+        "class":"super-capital",
+        "faction":["kushan","taiidan"],
+        "cost":7
+    },
+    {
+        "name":"cloaked-fighter",
+        "class":"fighter",
+        "faction":["kushan","taiidan"],
+        "cost":7
+    },
+    {
+        "name":"gun-platform",
+        "class":"platform",
+        "faction":["kushan","taiidan"],
+        "cost":2
+    },
+    {
+        "name":"heavy-cruiser",
+        "class":"super-capital",
+        "faction":["kushan","taiidan"],
+        "cost":12
     }
+
 ]

@@ -2,9 +2,9 @@
     {
         "name":"vice-admiral",
         "class-assignment":["super-capital","station"],
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":3,
-        "hand":5,
+        "hand":4,
         "play":2,
         "slots":[
             {
@@ -20,7 +20,7 @@
     {
         "name":"squadron-leader",
         "class-assignment":"fighter",
-        "faction":"kushan",
+        "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
         "play":1
@@ -28,15 +28,7 @@
     {
         "name":"commander",
         "class-assignment":"corvette",
-        "faction":"kushan",
-        "cost":1,
-        "hand":1,
-        "play":1
-    },
-    {
-        "name":"commander",
-        "class-assignment":"corvette",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
         "play":1
@@ -44,7 +36,7 @@
     {
         "name":"admiral",
         "class-assignment":"super-capital",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":4,
         "hand":5,
         "play":3,
@@ -64,27 +56,9 @@
         ]
     },
     {
-        "name":"vice-admiral",
-        "class-assignment":"super-capital",
-        "faction":"taiidan",
-        "cost":3,
-        "hand":4,
-        "play":2,
-        "slots":[
-            {
-                "class":"super-capital",
-                "purchase":"required"
-            },
-            {
-                "class":"frigate",
-                "purchase":"optional"
-            }
-        ]
-    },
-    {
         "name":"carrier-captain",
         "class-assignment":"carrier",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
         "play":1,
@@ -98,7 +72,7 @@
     {
         "name":"commander",
         "class-assignment":"corvette",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
         "play":1
@@ -106,7 +80,7 @@
     {
         "name":"wing-commander",
         "class-assignment":"fighter",
-        "faction":"taiidan",
+        "faction":["kushan", "taiidan"],
         "cost":2,
         "hand":2,
         "play":1
@@ -114,7 +88,7 @@
     {
         "name":"captain",
         "class-assignment":"frigate",
-        "faction":"taiidan",
+        "faction":["kushan","taiidan"],
         "cost":1,
         "hand":1,
         "play":1,
@@ -126,17 +100,9 @@
         ]
     },
     {
-        "name":"wing-commander",
-        "class-assignment":"fighter",
-        "faction":"kushan",
-        "cost":2,
-        "hand":2,
-        "play":1
-    },
-    {
-        "name":"marine-commander",
+        "name":"marine-captain",
         "class-assignment":["corvette","frigate"],
-        "faction":"kushan",
+        "faction":["kushan","taiidan"],
         "cost":2,
         "hand":2,
         "play":1,
@@ -146,5 +112,136 @@
                 "purchase":"optional"
             }
         ]
+    },
+    {
+        "name":"marine-commander",
+        "class-assignment":["corvette","frigate"],
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "hand":1,
+        "play":1,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"chief-of-staff",
+        "class-assignment":["super-capital"],
+        "faction":["kushan", "taiidan"],
+        "cost":1,
+        "hand":0,
+        "play":1,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"optional",
+                "count":2
+            }
+        ],
+        "staff":true
+    },
+    {
+        "name":"commodore",
+        "class-assignment":["frigate"],
+        "faction":["kushan", "taiidan"],
+        "cost":2,
+        "hand":2,
+        "play":1,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"required"
+            },
+            {
+                "class":"frigate",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"launch-commander",
+        "class-assignment":["carrier"],
+        "faction":["kushan","taiidan"],
+        "cost":3,
+        "hand":2,
+        "play":1,
+        "slots":[
+            {
+                "class":"super-capital",
+                "purchase":"required"
+            }
+        ]
+    },
+    {
+        "name":"recon-commander",
+        "class-assignment":["corvette"],
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "hand":2,
+        "play":1
+    },
+    {
+        "name":"strategist",
+        "class-assignment":"super-capital",
+        "faction":["kushan", "taiidan"],
+        "cost":5,
+        "hand":4,
+        "play":2,
+        "slots":[
+            {
+                "class":"super-capital",
+                "purchase":"required"
+            },
+            {
+                "class":"super-capital",
+                "purchase":"optional"
+            },
+            {
+                "class":"frigate",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"hot-shot-pilot",
+        "class-assignment":["fighter"],
+        "faction":["kushan","taiidan"],
+        "cost":3,
+        "hand":2,
+        "play":1
+    },
+    {
+        "name":"grizzled-veteran",
+        "class-assignment":"frigate",
+        "faction":["kushan", "taiidan"],
+        "cost":3,
+        "hand":2,
+        "play":1,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"required"
+            }
+        ]
+    },
+    {
+        "name":"raid-commander",
+        "class-assignment":["corvette"],
+        "faction":["kushan","taiidan"],
+        "cost":1,
+        "hand":1,
+        "play":1
+    },
+    {
+        "name":"master-engineer",
+        "class-assignment":["station","frigate"],
+        "faction":["kushan", "taiidan"],
+        "cost":2,
+        "hand":2,
+        "play":1,
+        "staff":true
     }
 ]
