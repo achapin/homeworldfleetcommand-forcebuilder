@@ -1,0 +1,4 @@
+function initialize()
+{
+    alert("initialized");    
+}
