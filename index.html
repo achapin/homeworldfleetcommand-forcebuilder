@@ -4,5 +4,37 @@
 </head>
 <body onload="initialize()">
     <script src="hfcufb.js"></script>
+    <h2>Homeworld Fleet Command - Force Builder</h2>
+    <div id="headerSection">
+        <label for="forceName">Force Name:</label>
+        <input type="text" id="forceName" name="forceName">
+        <span>Force Cost:</span>
+        <span id="forceCost">0</span>★ 
+        <br />
+        <button onclick="saveForce()">Save Force</button>
+        <button onclick="openForceWindow()">Load Force</button>
+    </div>
+    <div id="warnings"></div>
+    <div id="add">
+        <div>
+            <span>Add Leader:</span>
+            <option id="leaderOptions"></option>
+        </div>
+        <div>
+            <span>Add Unit:</span>
+            <option id="unitOptions"></option>
+        </div>
+    </div>
+    <div id="force">
+        <div id="unassignedLeaders"></div>
+        <div id="units"></div>
+    </div>
+    <div id="forceWindow" class="hidden">
+        <div>
+            <h2>Forces:</h2>
+            <button onclick="closeForceWindow()" class="closeButton">X</button>
+        </div>
+        <div id="forceList"></div>
+    </div>
 </body>
 </html>
