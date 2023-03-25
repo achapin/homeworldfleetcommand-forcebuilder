@@ -1,0 +1,14 @@
+#forceWindow {
+    position: fixed;
+    top: 5em;
+    left: 5em;
+    background-color: rgb(255, 240, 86);
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 1em;
+    border: 3px black solid;
+}
+
+.hidden {
+    visibility: hidden;
+}

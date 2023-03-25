@@ -2,6 +2,7 @@ var force = [];
 var leaders = [];
 var ships = [];
 var upgrades = [];
+var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -25,11 +26,6 @@ function loadURL(url){
 			}
 		};
 	});
-}
-
-function initialize()
-{
-    alert("initialized");    
 }
 
 function saveForce() {
@@ -89,12 +85,79 @@ function closeForceWindow() {
     forceWindow.classList.add("hidden")
 }
 
+function setupOptions()
+{
+    var leaderSection = document.getElementById("addLeaderSection")
+    var leaderLabel = document.createElement("span");
+    leaderLabel.innerHTML = "Leaders:";
+    leaderSection.appendChild(leaderLabel);
+
+    var leaderDropdown = document.createElement("SELECT");
+    leaders.forEach(function(leader){
+        var option = new Option(leader.name + " (" + leader.cost + ")", leader.name);
+        leaderDropdown.add(option);
+    });
+    leaderSection.appendChild(leaderDropdown);
+
+    var leaderAddButton = document.createElement("button");
+    leaderAddButton.innerHTML = "Add Leader";
+    leaderAddButton.onclick = function(){
+        //TODO: Add leader to force
+        alert("Add "+ leaderDropdown.value + " to force");
+    }
+    leaderSection.appendChild(leaderAddButton);
+
+    var unitSection = document.getElementById("addUnitSection")
+    var unitLabel = document.createElement("span");
+    unitLabel.innerHTML = "Units:";
+    unitSection.appendChild(unitLabel);
+
+    var unitDropdown = document.createElement("SELECT");
+    ships.forEach(function(unit){
+        var option = new Option(unit.name + " (" + unit.cost + ")", unit.name);
+        unitDropdown.add(option);
+    });
+    unitSection.appendChild(unitDropdown);
+
+    var unitAddButton = document.createElement("button");
+    unitAddButton.innerHTML = "Add Unit";
+    unitAddButton.onclick = function(){
+        //TODO: Add unit to force
+        alert("Add "+ unitDropdown.value + " to force");
+    }
+    unitSection.appendChild(unitAddButton);
+}
+
 function shipsLoaded(json){
 	ships = json;
+    ships.sort(function compareShip(a,b){
+        checkClass(a);
+        checkClass(b);
+
+        if(classOrder.indexOf(a.class) != classOrder.indexOf(b.class)){
+            return classOrder.indexOf(a.class) - classOrder.indexOf(b.class);
+        }
+        if(a.cost != b.cost){
+            return b.cost - a.cost;
+        }
+        return a.name.localeCompare(b.name);
+    });
+}
+
+function checkClass(ship){
+    if(classOrder.indexOf(ship.class) < 0){
+        console.log("No ship class ranked for " + a.class + "of unit " + ship.name);
+    }
 }
 
 function leadersLoaded(json){
 	leaders = json;
+    leaders.sort(function compareleader(a,b){
+        if(a.cost != b.cost){
+            return b.cost - a.cost;
+        }
+        return a.name.localeCompare(b.name);
+    });
 }
 
 function upgradesLoaded(json){
@@ -116,6 +179,6 @@ function initialize()
 	upgradesLoadPromise.catch(function(){alert("upgrades data load failed");});
 
     Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise]).then(_ => {
-        alert("all data loaded");
+        setupOptions();
     });
 }
