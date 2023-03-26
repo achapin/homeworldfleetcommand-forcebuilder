@@ -70,14 +70,6 @@
         ]
     },
     {
-        "name":"commander",
-        "class-assignment":"corvette",
-        "faction":["kushan", "taiidan"],
-        "cost":1,
-        "hand":1,
-        "play":1
-    },
-    {
         "name":"wing-commander",
         "class-assignment":"fighter",
         "faction":["kushan", "taiidan"],

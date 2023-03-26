@@ -1,8 +1,10 @@
-var force = [];
+var force = {};
 var leaders = [];
-var ships = [];
+var units = [];
 var upgrades = [];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
+
+var unitDropdown, leaderDropdown;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -85,14 +87,143 @@ function closeForceWindow() {
     forceWindow.classList.add("hidden")
 }
 
-function setupOptions()
-{
+function addLeader(){
+    force.leaders.push(leaderDropdown.value);
+    updateForce();
+}
+
+function addUnit(){
+    force.units.push(unitDropdown.value);
+    updateForce();
+}
+
+function updateForce(){
+    renderEntries();
+    calculateForceCost();
+}
+
+function renderEntries(){
+    var leaderSection = document.getElementById("unassignedLeaders");
+    leaderSection.innerHTML = "";
+    force.leaders.forEach(function(leader) { renderLeader(leader, leaderSection) });
+
+    var unitSection = document.getElementById("units");
+    unitSection.innerHTML = "";
+    force.units.forEach(function(unit) { renderUnit(unit, unitSection)});
+}
+
+function renderLeader(leader, leaderSection){
+    var leaderContainer = document.createElement("div");
+    var leaderData = getLeaderData(leader);
+
+    var leaderNameLabel = document.createElement("span");
+    leaderNameLabel.innerHTML = leaderData.name;
+    leaderContainer.appendChild(leaderNameLabel);
+
+    var leaderCostLabel = document.createElement("span");
+    leaderCostLabel.innerHTML = "Cost";
+    leaderContainer.appendChild(leaderCostLabel);
+
+    var leaderCostValue = document.createElement("span");
+    leaderCostValue.innerHTML = leaderData.cost + "★";
+    leaderContainer.appendChild(leaderCostValue);
+
+    var leaderHandLabel = document.createElement("span");
+    leaderHandLabel.innerHTML = "Hand";
+    leaderContainer.appendChild(leaderHandLabel);
+
+    var leaderHandValue = document.createElement("span");
+    leaderHandValue.innerHTML = leaderData.hand;
+    leaderContainer.appendChild(leaderHandValue);
+
+    var leaderPlayLabel = document.createElement("span");
+    leaderPlayLabel.innerHTML = "Hand";
+    leaderContainer.appendChild(leaderPlayLabel);
+
+    var leaderPlayValue = document.createElement("span");
+    leaderPlayValue.innerHTML = leaderData.play;
+    leaderContainer.appendChild(leaderPlayValue);
+
+    leaderSection.appendChild(leaderContainer);
+}
+
+function renderUnit(unit, unitSection){
+    var unitContainer = document.createElement("div");
+    var unitData = getUnitData(unit);
+
+    var unitNameLabel = document.createElement("span");
+    unitNameLabel.innerHTML = unitData.name;
+    unitContainer.appendChild(unitNameLabel);
+
+    var unitCostLabel = document.createElement("span");
+    unitCostLabel.innerHTML = "Cost";
+    unitContainer.appendChild(unitCostLabel);
+
+    var unitCostValue = document.createElement("span");
+    unitCostValue.innerHTML = unitData.cost + "★";
+    unitContainer.appendChild(unitCostValue);
+
+    var unitClassLabel = document.createElement("span");
+    unitClassLabel.innerHTML = "Class:";
+    unitContainer.appendChild(unitClassLabel);
+
+    var unitClassValue = document.createElement("span");
+    unitClassValue.innerHTML = unitData.class;
+    unitContainer.appendChild(unitClassValue);
+
+    unitSection.appendChild(unitContainer);
+}
+
+function calculateForceCost(){
+
+    //Both Kushan and Taiidan both have 2-hand 1-play as a base
+    var totalHand = 2;
+    var totalPlay = 1;
+
+    var totalCost = 0;
+    force.leaders.forEach(function(leader) { 
+        var leaderData = getLeaderData(leader);
+        totalCost += leaderData.cost;
+        totalHand += leaderData.hand;
+        totalPlay += leaderData.play;
+     });
+    force.units.forEach(function(unit) { 
+        var unitData = getUnitData(unit);
+        totalCost += unitData.cost;
+     });
+     
+     document.getElementById("forceCost").innerHTML = totalCost;
+     document.getElementById("totalHand").innerHTML = totalHand;
+     document.getElementById("totalPlay").innerHTML = totalPlay;
+}
+
+function getLeaderData(leaderId){
+    var result = leaders.find(leader => {
+        return leader.name.localeCompare(leaderId) == 0;
+    });
+    if(result == null) {
+        alert("No leader data found for id " + leader);
+    }
+    return result;
+}
+
+function getUnitData(unitId){
+    var result = units.find(unit => {
+        return unit.name.localeCompare(unitId) == 0;
+    });
+    if(result == null) {
+        alert("No unit data found for id " + unit);
+    }
+    return result;
+}
+
+function setupOptions(){
     var leaderSection = document.getElementById("addLeaderSection")
     var leaderLabel = document.createElement("span");
     leaderLabel.innerHTML = "Leaders:";
     leaderSection.appendChild(leaderLabel);
 
-    var leaderDropdown = document.createElement("SELECT");
+    leaderDropdown = document.createElement("SELECT");
     leaders.forEach(function(leader){
         var option = new Option(leader.name + " (" + leader.cost + ")", leader.name);
         leaderDropdown.add(option);
@@ -102,8 +233,7 @@ function setupOptions()
     var leaderAddButton = document.createElement("button");
     leaderAddButton.innerHTML = "Add Leader";
     leaderAddButton.onclick = function(){
-        //TODO: Add leader to force
-        alert("Add "+ leaderDropdown.value + " to force");
+        addLeader(leaderDropdown);
     }
     leaderSection.appendChild(leaderAddButton);
 
@@ -112,8 +242,8 @@ function setupOptions()
     unitLabel.innerHTML = "Units:";
     unitSection.appendChild(unitLabel);
 
-    var unitDropdown = document.createElement("SELECT");
-    ships.forEach(function(unit){
+    unitDropdown = document.createElement("SELECT");
+    units.forEach(function(unit){
         var option = new Option(unit.name + " (" + unit.cost + ")", unit.name);
         unitDropdown.add(option);
     });
@@ -122,15 +252,19 @@ function setupOptions()
     var unitAddButton = document.createElement("button");
     unitAddButton.innerHTML = "Add Unit";
     unitAddButton.onclick = function(){
-        //TODO: Add unit to force
-        alert("Add "+ unitDropdown.value + " to force");
+        addUnit(unitDropdown);
     }
     unitSection.appendChild(unitAddButton);
 }
 
+function setupForce(){
+    force.leaders = [];
+    force.units = [];
+}
+
 function shipsLoaded(json){
-	ships = json;
-    ships.sort(function compareShip(a,b){
+	units = json;
+    units.sort(function compareShip(a,b){
         checkClass(a);
         checkClass(b);
 
@@ -180,5 +314,7 @@ function initialize()
 
     Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise]).then(_ => {
         setupOptions();
+        setupForce();
+        calculateForceCost();
     });
 }
