@@ -88,12 +88,16 @@ function closeForceWindow() {
 }
 
 function addLeader(){
-    force.leaders.push(leaderDropdown.value);
+    var newEntry = new LeaderEntry();
+    newEntry.leaderId = leaderDropdown.value;
+    force.leaders.push(newEntry);
     updateForce();
 }
 
 function addUnit(){
-    force.units.push(unitDropdown.value);
+    var newEntry = new UnitEntry();
+    newEntry.unitId = unitDropdown.value; 
+    force.units.push(newEntry);
     updateForce();
 }
 
@@ -114,7 +118,7 @@ function renderEntries(){
 
 function renderLeader(leader, leaderSection){
     var leaderContainer = document.createElement("div");
-    var leaderData = getLeaderData(leader);
+    var leaderData = getLeaderData(leader.leaderId);
 
     var leaderNameLabel = document.createElement("span");
     leaderNameLabel.innerHTML = leaderData.name;
@@ -144,12 +148,24 @@ function renderLeader(leader, leaderSection){
     leaderPlayValue.innerHTML = leaderData.play;
     leaderContainer.appendChild(leaderPlayValue);
 
+    var removeButton = document.createElement("button");
+    removeButton.innerHTML = "X";
+    removeButton.onclick = function(){
+        const index = force.leaders.indexOf(leader);
+        if(index > -1){
+            force.leaders.splice(index, 1);
+        }
+        //TODO: Remove leader from ship, if they are assigned
+        updateForce();
+    }
+    leaderContainer.appendChild(removeButton);
+
     leaderSection.appendChild(leaderContainer);
 }
 
 function renderUnit(unit, unitSection){
     var unitContainer = document.createElement("div");
-    var unitData = getUnitData(unit);
+    var unitData = getUnitData(unit.unitId);
 
     var unitNameLabel = document.createElement("span");
     unitNameLabel.innerHTML = unitData.name;
@@ -171,6 +187,17 @@ function renderUnit(unit, unitSection){
     unitClassValue.innerHTML = unitData.class;
     unitContainer.appendChild(unitClassValue);
 
+    var removeButton = document.createElement("button");
+    removeButton.innerHTML = "X";
+    removeButton.onclick = function(){
+        const index = force.units.indexOf(unit);
+        if(index > -1){
+            force.units.splice(index, 1);
+        }
+        updateForce();
+    }
+    unitContainer.appendChild(removeButton);
+
     unitSection.appendChild(unitContainer);
 }
 
@@ -182,13 +209,13 @@ function calculateForceCost(){
 
     var totalCost = 0;
     force.leaders.forEach(function(leader) { 
-        var leaderData = getLeaderData(leader);
+        var leaderData = getLeaderData(leader.leaderId);
         totalCost += leaderData.cost;
         totalHand += leaderData.hand;
         totalPlay += leaderData.play;
      });
     force.units.forEach(function(unit) { 
-        var unitData = getUnitData(unit);
+        var unitData = getUnitData(unit.unitId);
         totalCost += unitData.cost;
      });
      
@@ -317,4 +344,15 @@ function initialize()
         setupForce();
         calculateForceCost();
     });
+}
+
+class UnitEntry {
+    unitId = "";
+    commander = null;
+    staff = [];
+    upgrades = [];
+}
+
+class LeaderEntry{
+    leaderId;
 }
