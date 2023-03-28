@@ -90,6 +90,7 @@ function closeForceWindow() {
 function addLeader(){
     var newEntry = new LeaderEntry();
     newEntry.leaderId = leaderDropdown.value;
+    newEntry.uniqueCode = "" + Date.now()
     force.leaders.push(newEntry);
     updateForce();
 }
@@ -151,11 +152,17 @@ function renderLeader(leader, leaderSection){
     var removeButton = document.createElement("button");
     removeButton.innerHTML = "X";
     removeButton.onclick = function(){
+
+        if(leader.assignedUnit != null){
+            leader.assignedUnit.commander = null;
+            //TODO: if staff, remove from staff list
+        }
+
         const index = force.leaders.indexOf(leader);
         if(index > -1){
             force.leaders.splice(index, 1);
         }
-        //TODO: Remove leader from ship, if they are assigned
+
         updateForce();
     }
     leaderContainer.appendChild(removeButton);
@@ -187,9 +194,50 @@ function renderUnit(unit, unitSection){
     unitClassValue.innerHTML = unitData.class;
     unitContainer.appendChild(unitClassValue);
 
+    var unitCommanderLabel = document.createElement("span");
+    unitCommanderLabel.innerHTML = "Commander:";
+    unitContainer.appendChild(unitCommanderLabel);
+
+    var leaderOptions = document.createElement("SELECT");
+    leaderOptions.add(new Option("No Commander", null));
+    force.leaders.forEach(function(leader){
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null  || unit.commander == leader.uniqueCode)
+            && canLeaderBeOn(leaderData, unitData)){
+            var option = new Option(leaderData.name, leader.uniqueCode);
+            leaderOptions.add(option);
+        }
+    });
+    if(unit.commander != null){
+        leaderOptions.value = unit.commander;
+    }
+    leaderOptions.onchange = function(){
+
+        if(unit.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        if(leaderOptions.selectedIndex == 0){
+            unit.commander = null;
+        } else {
+            var assignedLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(leaderOptions.value) == 0);
+            unit.commander = assignedLeader.uniqueCode;
+            assignedLeader.assignedUnit = unit;
+        }
+        updateForce();
+    }
+    unitContainer.appendChild(leaderOptions);
+
     var removeButton = document.createElement("button");
     removeButton.innerHTML = "X";
     removeButton.onclick = function(){
+
+        if(unit.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
         const index = force.units.indexOf(unit);
         if(index > -1){
             force.units.splice(index, 1);
@@ -242,6 +290,11 @@ function getUnitData(unitId){
         alert("No unit data found for id " + unit);
     }
     return result;
+}
+
+function canLeaderBeOn(leader, unit){
+    var matchingAssingment = leader.classAssignment.find(allowedClass => unit.class.localeCompare(allowedClass) == 0);
+    return matchingAssingment != null;
 }
 
 function setupOptions(){
@@ -354,5 +407,7 @@ class UnitEntry {
 }
 
 class LeaderEntry{
-    leaderId;
+    leaderId = "";
+    assignedUnit = null;
+    uniqueCode = "";
 }

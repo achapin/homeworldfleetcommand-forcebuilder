@@ -1,7 +1,7 @@
 [
     {
         "name":"vice-admiral",
-        "class-assignment":["super-capital","station"],
+        "classAssignment":["super-capital","station"],
         "faction":["kushan","taiidan"],
         "cost":3,
         "hand":4,
@@ -19,7 +19,7 @@
     },
     {
         "name":"squadron-leader",
-        "class-assignment":"fighter",
+        "classAssignment":["fighter"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
@@ -27,7 +27,7 @@
     },
     {
         "name":"commander",
-        "class-assignment":"corvette",
+        "classAssignment":["corvette"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
@@ -35,7 +35,7 @@
     },
     {
         "name":"admiral",
-        "class-assignment":"super-capital",
+        "classAssignment":["super-capital"],
         "faction":["kushan", "taiidan"],
         "cost":4,
         "hand":5,
@@ -57,7 +57,7 @@
     },
     {
         "name":"carrier-captain",
-        "class-assignment":"carrier",
+        "classAssignment":["carrier"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
@@ -71,7 +71,7 @@
     },
     {
         "name":"wing-commander",
-        "class-assignment":"fighter",
+        "classAssignment":["fighter"],
         "faction":["kushan", "taiidan"],
         "cost":2,
         "hand":2,
@@ -79,7 +79,7 @@
     },
     {
         "name":"captain",
-        "class-assignment":"frigate",
+        "classAssignment":["frigate"],
         "faction":["kushan","taiidan"],
         "cost":1,
         "hand":1,
@@ -93,7 +93,7 @@
     },
     {
         "name":"marine-captain",
-        "class-assignment":["corvette","frigate"],
+        "classAssignment":["corvette","frigate"],
         "faction":["kushan","taiidan"],
         "cost":2,
         "hand":2,
@@ -107,7 +107,7 @@
     },
     {
         "name":"marine-commander",
-        "class-assignment":["corvette","frigate"],
+        "classAssignment":["corvette","frigate"],
         "faction":["kushan","taiidan"],
         "cost":2,
         "hand":1,
@@ -121,7 +121,7 @@
     },
     {
         "name":"chief-of-staff",
-        "class-assignment":["super-capital"],
+        "classAssignment":["super-capital"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":0,
@@ -137,7 +137,7 @@
     },
     {
         "name":"commodore",
-        "class-assignment":["frigate"],
+        "classAssignment":["frigate"],
         "faction":["kushan", "taiidan"],
         "cost":2,
         "hand":2,
@@ -155,7 +155,7 @@
     },
     {
         "name":"launch-commander",
-        "class-assignment":["carrier"],
+        "classAssignment":["carrier"],
         "faction":["kushan","taiidan"],
         "cost":3,
         "hand":2,
@@ -169,7 +169,7 @@
     },
     {
         "name":"recon-commander",
-        "class-assignment":["corvette"],
+        "classAssignment":["corvette"],
         "faction":["kushan","taiidan"],
         "cost":2,
         "hand":2,
@@ -177,7 +177,7 @@
     },
     {
         "name":"strategist",
-        "class-assignment":"super-capital",
+        "classAssignment":["super-capital"],
         "faction":["kushan", "taiidan"],
         "cost":5,
         "hand":4,
@@ -199,7 +199,7 @@
     },
     {
         "name":"hot-shot-pilot",
-        "class-assignment":["fighter"],
+        "classAssignment":["fighter"],
         "faction":["kushan","taiidan"],
         "cost":3,
         "hand":2,
@@ -207,7 +207,7 @@
     },
     {
         "name":"grizzled-veteran",
-        "class-assignment":"frigate",
+        "classAssignment":["frigate"],
         "faction":["kushan", "taiidan"],
         "cost":3,
         "hand":2,
@@ -221,7 +221,7 @@
     },
     {
         "name":"raid-commander",
-        "class-assignment":["corvette"],
+        "classAssignment":["corvette"],
         "faction":["kushan","taiidan"],
         "cost":1,
         "hand":1,
@@ -229,7 +229,7 @@
     },
     {
         "name":"master-engineer",
-        "class-assignment":["station","frigate"],
+        "classAssignment":["station","frigate"],
         "faction":["kushan", "taiidan"],
         "cost":2,
         "hand":2,
