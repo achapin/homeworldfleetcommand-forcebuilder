@@ -3,8 +3,18 @@ var leaders = [];
 var units = [];
 var upgrades = [];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
+var metaClasses = {
+    "super-capital" : "capital",
+    "frigate" : "capital",
+    "station" : "capital",
+    "corvette" : "strike-craft",
+    "fighter" : "strike-craft",
+    "platform" : "strike-craft"
+};
 
 var unitDropdown, leaderDropdown;
+
+var requiredSlots, optionalSlots, freeSlots, unslottedUnits, freeUnits;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -30,6 +40,11 @@ function loadURL(url){
 	});
 }
 
+function newForce() {
+    setupForce();
+    updateForce();
+}
+
 function saveForce() {
     var directory = getSaveDirectory();
     var forceName = document.getElementById("forceName").value + " : " + document.getElementById("forceCost").innerHTML;
@@ -39,6 +54,15 @@ function saveForce() {
     window.localStorage.setItem('forceDirectory', JSON.stringify(directory));
     window.localStorage.setItem(forceName, JSON.stringify(force));
     console.log("force saved as " + forceName);
+}
+
+function loadForce(forceName) {
+    force = {};
+    forceJson = JSON.parse(window.localStorage.getItem(forceName));
+    console.log("Force contents:")
+    force.units = forceJson.units;
+    force.leaders = forceJson.leaders;
+    updateForce();
 }
 
 function openForceWindow() {
@@ -95,26 +119,132 @@ function addLeader(){
     updateForce();
 }
 
-function addUnit(){
+function addUnit(newUnitId) {
     var newEntry = new UnitEntry();
-    newEntry.unitId = unitDropdown.value; 
+    newEntry.unitId = newUnitId; 
     force.units.push(newEntry);
     updateForce();
 }
 
 function updateForce(){
+    processSlots();
     renderEntries();
     calculateForceCost();
+}
+
+function processSlots() {
+    requiredSlots = [];
+    optionalSlots = [];
+    freeSlots = [];
+    unslottedUnits = [];
+    freeUnits = [];
+    
+    //Fill slots lists
+    force.leaders.forEach(function(leader) { 
+        var leaderData = getLeaderData(leader.leaderId);
+        if(leaderData.hasOwnProperty("slots")){
+            addSlots(requiredSlots, optionalSlots, freeSlots, leaderData);
+        }
+    });
+    force.units.forEach(function(unit) { 
+        var unitData = getUnitData(unit.unitId);
+        if(unitData.hasOwnProperty("slots")){
+            addSlots(requiredSlots, optionalSlots, freeSlots, unitData);
+        }
+    });
+
+    //Consume slots lists
+    force.units.forEach(function(unit) { 
+        var unitData = getUnitData(unit.unitId);
+        if(freeSlots.indexOf(unitData.name) >= 0){
+            freeSlots.splice(freeSlots.indexOf(unitData.name), 1);
+            freeUnits.push(unit);
+            return;
+        }
+        if(freeSlots.indexOf(unitData.class) >= 0){
+            freeSlots.splice(freeSlots.indexOf(unitData.class), 1);
+            freeUnits.push(unit);
+            return;
+        }
+        if(requiredSlots.indexOf(unitData.name) >= 0){
+            requiredSlots.splice(requiredSlots.indexOf(unitData.name), 1);
+            return;
+        }
+        if(requiredSlots.indexOf(unitData.class) >= 0){
+            requiredSlots.splice(requiredSlots.indexOf(unitData.class), 1);
+            return;
+        }
+        if(optionalSlots.indexOf(unitData.name) >= 0){
+            optionalSlots.splice(optionalSlots.indexOf(unitData.name), 1);
+            return;
+        }
+        if(optionalSlots.indexOf(unitData.class) >= 0){
+            optionalSlots.splice(optionalSlots.indexOf(unitData.class), 1);
+            return;
+        }
+        var metaClass = metaClasses[unitData.class];
+        if(optionalSlots.indexOf(metaClass) >= 0){
+            optionalSlots.splice(optionalSlots.indexOf(metaClass), 1);
+            return;
+        }
+        unslottedUnits.push(unit);
+    });
 }
 
 function renderEntries(){
     var leaderSection = document.getElementById("unassignedLeaders");
     leaderSection.innerHTML = "";
-    force.leaders.forEach(function(leader) { renderLeader(leader, leaderSection) });
+    force.leaders.forEach(function(leader) { 
+        if(leader.assignedUnit == null){
+            renderLeader(leader, leaderSection) 
+        }
+    });
 
     var unitSection = document.getElementById("units");
     unitSection.innerHTML = "";
-    force.units.forEach(function(unit) { renderUnit(unit, unitSection)});
+    force.units.forEach(function(unit) { 
+        renderUnit(unit, unitSection);
+    });
+
+    if(requiredSlots.length > 0 || optionalSlots.length > 0){
+        var emptySlotSection = document.createElement("div");
+        freeSlots.forEach(freeSlot => {
+            var emptyFreeSlotSection = document.createElement("div");
+            emptyFreeSlotSection.innerHTML = "Free: " + freeSlot;
+            emptySlotSection.appendChild(emptyFreeSlotSection);
+        });
+        requiredSlots.forEach(requiredSlot => {
+            var emptyRequiredSlotSection = document.createElement("div");
+            emptyRequiredSlotSection.innerHTML = "REQUIRED: " + requiredSlot;
+            emptySlotSection.appendChild(emptyRequiredSlotSection);
+        });
+        optionalSlots.forEach(optionalSlot => {
+            var emptyOptionalSlotSection = document.createElement("div");
+            emptyOptionalSlotSection.innerHTML = "Optional: " + optionalSlot;
+            emptySlotSection.appendChild(emptyOptionalSlotSection);
+        });
+        unitSection.appendChild(emptySlotSection);
+    }
+}
+
+function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
+    entryData.slots.forEach(slot => {
+        var slotCount = 1;
+        if(slot.hasOwnProperty("count")) {
+            slotCount = slot.count;
+        }
+        for(var slotIndex = 0; slotIndex < slotCount; slotIndex++){
+            if(slot.purchase == "free"){
+                freeSlots.push(slot.class);
+            }
+            if(slot.purchase == "required"){
+                requiredSlots.push(slot.class);
+            }
+            if(slot.purchase == "optional"){
+                optionalSlots.push(slot.class);
+            }
+        }
+    });
 }
 
 function renderLeader(leader, leaderSection){
@@ -142,7 +272,7 @@ function renderLeader(leader, leaderSection){
     leaderContainer.appendChild(leaderHandValue);
 
     var leaderPlayLabel = document.createElement("span");
-    leaderPlayLabel.innerHTML = "Hand";
+    leaderPlayLabel.innerHTML = "Play";
     leaderContainer.appendChild(leaderPlayLabel);
 
     var leaderPlayValue = document.createElement("span");
@@ -229,6 +359,18 @@ function renderUnit(unit, unitSection){
     }
     unitContainer.appendChild(leaderOptions);
 
+    if(unit.commander != null){
+        var unitCommanderDiv = document.createElement("div");
+        renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0), unitCommanderDiv);
+        unitContainer.appendChild(unitCommanderDiv);
+    }
+
+    if(unslottedUnits.indexOf(unit) >= 0){
+        var slotWarningdiv = document.createElement("div");
+        slotWarningdiv.innerHTML = "⚠ Ship is not in any available slot"
+        unitContainer.appendChild(slotWarningdiv);
+    }
+
     var removeButton = document.createElement("button");
     removeButton.innerHTML = "X";
     removeButton.onclick = function(){
@@ -263,8 +405,10 @@ function calculateForceCost(){
         totalPlay += leaderData.play;
      });
     force.units.forEach(function(unit) { 
-        var unitData = getUnitData(unit.unitId);
-        totalCost += unitData.cost;
+        if(freeUnits.indexOf(unit) < 0){
+            var unitData = getUnitData(unit.unitId);
+            totalCost += unitData.cost;
+        }
      });
      
      document.getElementById("forceCost").innerHTML = totalCost;
@@ -287,13 +431,15 @@ function getUnitData(unitId){
         return unit.name.localeCompare(unitId) == 0;
     });
     if(result == null) {
-        alert("No unit data found for id " + unit);
+        alert("No unit data found for id " + unitId);
     }
     return result;
 }
 
 function canLeaderBeOn(leader, unit){
-    var matchingAssingment = leader.classAssignment.find(allowedClass => unit.class.localeCompare(allowedClass) == 0);
+    var matchingAssingment = leader.classAssignment.find(allowedClass => 
+        unit.class.localeCompare(allowedClass) == 0 
+        || unit.name.localeCompare(allowedClass) == 0);
     return matchingAssingment != null;
 }
 
@@ -332,7 +478,7 @@ function setupOptions(){
     var unitAddButton = document.createElement("button");
     unitAddButton.innerHTML = "Add Unit";
     unitAddButton.onclick = function(){
-        addUnit(unitDropdown);
+        addUnit(unitDropdown.value);
     }
     unitSection.appendChild(unitAddButton);
 }
