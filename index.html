@@ -5,33 +5,45 @@
 </head>
 <body onload="initialize()">
     <script src="hfcufb.js"></script>
-    <h2>Homeworld Fleet Command - Force Builder</h2>
+    <h1>Homeworld Fleet Command - Unofficial Force Builder</h1>
     <div id="headerSection">
-        <label for="forceName">Force Name:</label>
-        <input type="text" id="forceName" name="forceName">
-        <span>Faction:</span>
-        <select id="factionSelector"></select>
-        <span>Force Cost:</span>
-        <span id="forceCost">0</span>★
-        <span>Hand:</span>
-        <span id="totalHand">0</span>
-        <span>Play:</span>
-        <span id="totalPlay">0</span>
-        <br />
-        <button onclick="newForce()">New Force</button>
-        <button onclick="saveForce()">Save Force</button>
-        <button onclick="openForceWindow()">Load Force</button>
+        <span>Force Information</span>
+        <div id="headerIdentity">
+            <label for="forceName">Force Name:</label>
+            <input type="text" id="forceName" name="forceName">
+            <label for="factionSelector">Faction:</label>
+            <select id="factionSelector"></select>
+        </div>
+        <div id="headerDetails">
+            <label for="forceCost">Force Cost:</label>
+            <span id="forceCost">0</span>
+            <label for="totalHand">Hand:</label>
+            <span id="totalHand">0</span>
+            <label for="totalPlay">Play:</label>
+            <span id="totalPlay">0</span>
+        </div>
+        <div id="headerButtons">
+            <button onclick="newForce()">New Force</button>
+            <button onclick="saveForce()">Save Force</button>
+            <button onclick="openForceWindow()">Load Force</button>
+        </div>
     </div>
     <div id="warnings"></div>
     <div id="add">
-        <div id="addLeaderSection">
-        </div>
-        <div id="addUnitSection">
-        </div>
+        <span>Force Acquisition</span>
+        <div id="addLeaderSection"></div>
+        <div id="addUnitSection"></div>
     </div>
     <div id="force">
-        <div id="unassignedLeaders"></div>
-        <div id="units"></div>
+        <span>Force Composition</span> <br />
+        <div id="unassignedLeadersSection">
+            <span>Unassigned Leaders</span>
+            <div id="unassignedLeaders"></div>
+        </div>
+        <div id="unitsSection">
+            <span>Units</span>
+            <div id="units"></div>
+        </div>
     </div>
     <div id="forceWindow" class="hidden">
         <div>

@@ -1,3 +1,134 @@
+@font-face {
+    font-family: "Robotica";
+    src: url("fonts/Robotica.ttf");
+}
+
+@font-face {
+    font-family: "Oxanium";
+    src: url("fonts/oxanium/Oxanium-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Oxanium-Light";
+    src: url("fonts/oxanium/Oxanium-Light.ttf");
+}
+
+@font-face {
+    font-family: "Oxanium-Bold";
+    src: url("fonts/oxanium/Oxanium-Bold.ttf");
+}
+
+body {
+    background-color: #000022;
+    padding: 1em;
+}
+
+h1 {
+    font-family: "Robotica";
+    color: #fbf5f3;
+}
+
+label {
+    font-family: "Oxanium";
+    color: #000022;
+}
+
+span {
+    font-family: "Oxanium-Bold";
+    color: #c42847;
+    background-color: #e28413;
+    padding-left: .5em;
+    padding-right: .5em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    border-radius: 1em;
+}
+
+select {
+    font-family: "Oxanium-Light";
+}
+
+button {
+    font-family: "Oxanium";
+    font-weight: bold;
+    border-radius: 1em;
+    background-color: #c42847;
+    color: #000022;
+}
+
+#headerSection {
+    background-color: #de3c4b;
+    border-radius: 1em;
+    padding: 1em;
+    margin-bottom: .5em;
+    display: inline-block;
+}
+
+#headerIdentity {
+    padding-top: .5em;
+    padding-bottom: .25em;
+}
+
+#headerDetails {
+    padding-top: .25em;
+    padding-bottom: .5em;
+}
+
+#headerButtons {
+    clear: both;
+}
+
+#add {
+    background-color: #de3c4b;
+    border-radius: 1em;
+    padding: 1em;
+    display: inline-block;
+    margin-bottom: .5em;
+}
+
+#add div {
+    margin: .5em;
+}
+
+#force {
+    background-color: #de3c4b;
+    border-radius: 1em;
+    padding: 1%;
+    display: inline-block;
+    width: 98%;
+}
+
+#unassignedLeaders {
+    background-color: #000022;
+    border-radius: 1em;
+    border: 1px #000022 solid;
+    padding: .5em;
+    padding-top: 1em;
+    margin: .5em;
+}
+
+#units {
+    background-color: #000022;
+    border-radius: 1em;
+    border: 1px #000022 solid;
+    padding: .5em;
+    padding-top: 1em;
+    margin: .5em;
+}
+
+.entry {
+    background-color: #fbf5f3;
+    border-radius: 1em;
+    padding: .25em;
+    margin: .25em;
+}
+
+.removeButton {
+    float: right;
+    background-color: #de3c4b;
+    color: #000022;
+}
+
 #forceWindow {
     position: fixed;
     top: 5em;

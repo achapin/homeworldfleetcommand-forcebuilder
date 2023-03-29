@@ -254,7 +254,27 @@ function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
 
 function renderLeader(leader, leaderSection){
     var leaderContainer = document.createElement("div");
+    leaderContainer.classList.add("entry");
     var leaderData = getLeaderData(leader.leaderId);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Leader";
+    removeButton.onclick = function(){
+
+        if(leader.assignedUnit != null){
+            leader.assignedUnit.commander = null;
+            //TODO: if staff, remove from staff list
+        }
+
+        const index = force.leaders.indexOf(leader);
+        if(index > -1){
+            force.leaders.splice(index, 1);
+        }
+
+        updateForce();
+    }
+    leaderContainer.appendChild(removeButton);
 
     var leaderNameLabel = document.createElement("span");
     leaderNameLabel.innerHTML = leaderData.name;
@@ -284,30 +304,31 @@ function renderLeader(leader, leaderSection){
     leaderPlayValue.innerHTML = leaderData.play;
     leaderContainer.appendChild(leaderPlayValue);
 
-    var removeButton = document.createElement("button");
-    removeButton.innerHTML = "X";
-    removeButton.onclick = function(){
-
-        if(leader.assignedUnit != null){
-            leader.assignedUnit.commander = null;
-            //TODO: if staff, remove from staff list
-        }
-
-        const index = force.leaders.indexOf(leader);
-        if(index > -1){
-            force.leaders.splice(index, 1);
-        }
-
-        updateForce();
-    }
-    leaderContainer.appendChild(removeButton);
-
     leaderSection.appendChild(leaderContainer);
 }
 
 function renderUnit(unit, unitSection){
     var unitContainer = document.createElement("div");
+    unitContainer.classList.add("entry")
     var unitData = getUnitData(unit.unitId);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Unit";
+    removeButton.onclick = function(){
+
+        if(unit.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        const index = force.units.indexOf(unit);
+        if(index > -1){
+            force.units.splice(index, 1);
+        }
+        updateForce();
+    }
+    unitContainer.appendChild(removeButton);
 
     var unitWarningDiv = document.createElement("div");
 
@@ -386,23 +407,6 @@ function renderUnit(unit, unitSection){
 
     unitContainer.appendChild(unitWarningDiv);
 
-    var removeButton = document.createElement("button");
-    removeButton.innerHTML = "X";
-    removeButton.onclick = function(){
-
-        if(unit.commander != null){
-            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
-            currentLeader.assignedUnit = null;
-        }
-
-        const index = force.units.indexOf(unit);
-        if(index > -1){
-            force.units.splice(index, 1);
-        }
-        updateForce();
-    }
-    unitContainer.appendChild(removeButton);
-
     unitSection.appendChild(unitContainer);
 }
 
@@ -426,7 +430,7 @@ function calculateForceCost(){
         }
      });
      
-     document.getElementById("forceCost").innerHTML = totalCost;
+     document.getElementById("forceCost").innerHTML = totalCost + "★";
      document.getElementById("totalHand").innerHTML = totalHand;
      document.getElementById("totalPlay").innerHTML = totalPlay;
 }
