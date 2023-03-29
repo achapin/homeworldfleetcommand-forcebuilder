@@ -2,6 +2,7 @@ var force = {};
 var leaders = [];
 var units = [];
 var upgrades = [];
+var factions = ["kushan","taiidan"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
 var metaClasses = {
     "super-capital" : "capital",
@@ -15,6 +16,8 @@ var metaClasses = {
 var unitDropdown, leaderDropdown;
 
 var requiredSlots, optionalSlots, freeSlots, unslottedUnits, freeUnits;
+
+var factionSelection;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -62,6 +65,8 @@ function loadForce(forceName) {
     console.log("Force contents:")
     force.units = forceJson.units;
     force.leaders = forceJson.leaders;
+    force.faction = forceJson.faction;
+    factionSelection.value = force.faction;
     updateForce();
 }
 
@@ -304,6 +309,8 @@ function renderUnit(unit, unitSection){
     var unitContainer = document.createElement("div");
     var unitData = getUnitData(unit.unitId);
 
+    var unitWarningDiv = document.createElement("div");
+
     var unitNameLabel = document.createElement("span");
     unitNameLabel.innerHTML = unitData.name;
     unitContainer.appendChild(unitNameLabel);
@@ -366,10 +373,18 @@ function renderUnit(unit, unitSection){
     }
 
     if(unslottedUnits.indexOf(unit) >= 0){
-        var slotWarningdiv = document.createElement("div");
-        slotWarningdiv.innerHTML = "⚠ Ship is not in any available slot"
-        unitContainer.appendChild(slotWarningdiv);
+        var slotWarningdiv = document.createElement("span");
+        slotWarningdiv.innerHTML = "⚠ This Unit is not in any available slot"
+        unitWarningDiv.appendChild(slotWarningdiv);
     }
+
+    if(unitData.faction.indexOf(force.faction) < 0){
+        var factionWarningdiv = document.createElement("span");
+        factionWarningdiv.innerHTML = "⚠ This Unit is not available for the " + force.faction + " faction";
+        unitWarningDiv.appendChild(factionWarningdiv);
+    }
+
+    unitContainer.appendChild(unitWarningDiv);
 
     var removeButton = document.createElement("button");
     removeButton.innerHTML = "X";
@@ -444,6 +459,18 @@ function canLeaderBeOn(leader, unit){
 }
 
 function setupOptions(){
+
+    factionSelection = document.getElementById("factionSelector");
+    factions.forEach(faction =>{
+        var option = new Option(faction, faction);
+        factionSelection.add(option);
+    });
+    factionSelection.onchange = function() {
+        force.faction = factionSelection.value;
+        updateForce();
+        //Hm. Allow leaders and units from the opposite faction to be included?
+    }
+
     var leaderSection = document.getElementById("addLeaderSection")
     var leaderLabel = document.createElement("span");
     leaderLabel.innerHTML = "Leaders:";
@@ -484,6 +511,7 @@ function setupOptions(){
 }
 
 function setupForce(){
+    force.faction = factionSelection.value;
     force.leaders = [];
     force.units = [];
 }
