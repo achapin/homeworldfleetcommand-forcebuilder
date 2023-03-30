@@ -28,6 +28,22 @@ h1 {
     color: #fbf5f3;
 }
 
+h2 {
+    font-family: "Robotica";
+    color: #000022;
+}
+
+h3 {
+    font-family: "Robotica";
+    color: #c42847;
+    background-color: #e28413;
+    padding-left: .5em;
+    padding-right: .5em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    border-radius: 1em;
+}
+
 label {
     font-family: "Oxanium";
     color: #000022;
@@ -116,9 +132,26 @@ button {
     margin: .5em;
 }
 
+#emptySlots {
+    background-color: #000022;
+    border-radius: 1em;
+    border: 1px #000022 solid;
+    padding: .5em;
+    padding-top: 1em;
+    margin: .5em;
+}
+
 .entry {
     background-color: #fbf5f3;
     border-radius: 1em;
+    padding: .25em;
+    margin: .25em;
+}
+
+.commanderSection {
+    background-color: #fbf5f3;
+    border-radius: 1em;
+    border: 1px #000022 dashed;
     padding: .25em;
     margin: .25em;
 }
@@ -129,15 +162,55 @@ button {
     color: #000022;
 }
 
+.emptySlot {
+    background-color: #fbf5f3;
+    border-radius: 1em;
+    border: 1px #000022 dashed;
+    padding: .25em;
+    margin: .25em;
+}
+
+.emptyFreeSlot {
+    font-family: "Oxanium";
+    color: #000022;
+    background-color: #e28413;
+}
+
+.emptyRequiredSlot {
+    font-family: "Oxanium-Bold";
+    color: #000022;
+    background-color: #de3c4b;
+}
+
+.emptyOptionalSlot {
+    font-family: "Oxanium-Bold";
+    color: #e28413;
+    background-color: #000022;
+    border: 1px #c42847 dashed;
+}
+
 #forceWindow {
     position: fixed;
     top: 5em;
     left: 5em;
-    background-color: rgb(255, 240, 86);
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-bottom: 1em;
-    border: 3px black solid;
+    background-color: #fbf5f3;
+    padding: 1em;
+    border-radius: 1em;
+    border: 3px #000022 solid;
+}
+
+.forceEntry{
+    display: inline-block;
+}
+
+.forceEntry span {
+    margin-right: 1em;
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
+.forceWindowButton {
+    float:right;
 }
 
 .hidden {

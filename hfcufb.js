@@ -2,6 +2,7 @@ var force = {};
 var leaders = [];
 var units = [];
 var upgrades = [];
+var displayText = {};
 var factions = ["kushan","taiidan"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
 var metaClasses = {
@@ -12,6 +13,24 @@ var metaClasses = {
     "fighter" : "strike-craft",
     "platform" : "strike-craft"
 };
+var icons = {
+    "super-capital" : "▰",
+    "frigate" : "◆",
+    "station" : "●",
+    "corvette":"■",
+    "fighter":"▲",
+    "platform":"⬣"
+};
+
+var indexToLetter = {
+    "1" : "A",
+    "2" : "B",
+    "3" : "C",
+    "4" : "D",
+    "5" : "E",
+    "6" : "F",
+    "7" : "G"
+}
 
 var unitDropdown, leaderDropdown;
 
@@ -62,7 +81,8 @@ function saveForce() {
 function loadForce(forceName) {
     force = {};
     forceJson = JSON.parse(window.localStorage.getItem(forceName));
-    console.log("Force contents:")
+    var forceNameLength = forceName.lastIndexOf(" :");
+    document.getElementById("forceName").value = forceName.substring(0,forceNameLength);
     force.units = forceJson.units;
     force.leaders = forceJson.leaders;
     force.faction = forceJson.faction;
@@ -78,11 +98,11 @@ function openForceWindow() {
     forceList.innerHTML = "";
     directory.forEach(function(forceName) {
         var entry = document.createElement("div");
-        entry.classList.add("forceEntry")
         var name = document.createElement("span");
         name.innerHTML = forceName;
         entry.appendChild(name);
         var load = document.createElement("button");
+        load.classList.add("forceWindowButton");
         load.innerHTML = "Load";
         load.onclick = function() {
             loadForce(forceName);
@@ -207,29 +227,57 @@ function renderEntries(){
 
     var unitSection = document.getElementById("units");
     unitSection.innerHTML = "";
-    force.units.forEach(function(unit) { 
-        renderUnit(unit, unitSection);
+
+    force.units.sort(function compareUnit(a,b){
+        var aData = getUnitData(a.unitId);
+        var bData = getUnitData(b.unitId);
+        checkClass(aData);
+        checkClass(bData);
+
+        if(classOrder.indexOf(aData.class) != classOrder.indexOf(bData.class)){
+            return classOrder.indexOf(aData.class) - classOrder.indexOf(bData.class);
+        }
+        if(aData.cost != bData.cost){
+            return bData.cost - aData.cost;
+        }
+        return aData.name.localeCompare(bData.name);
     });
 
-    if(requiredSlots.length > 0 || optionalSlots.length > 0){
-        var emptySlotSection = document.createElement("div");
-        freeSlots.forEach(freeSlot => {
-            var emptyFreeSlotSection = document.createElement("div");
-            emptyFreeSlotSection.innerHTML = "Free: " + freeSlot;
-            emptySlotSection.appendChild(emptyFreeSlotSection);
-        });
-        requiredSlots.forEach(requiredSlot => {
-            var emptyRequiredSlotSection = document.createElement("div");
-            emptyRequiredSlotSection.innerHTML = "REQUIRED: " + requiredSlot;
-            emptySlotSection.appendChild(emptyRequiredSlotSection);
-        });
-        optionalSlots.forEach(optionalSlot => {
-            var emptyOptionalSlotSection = document.createElement("div");
-            emptyOptionalSlotSection.innerHTML = "Optional: " + optionalSlot;
-            emptySlotSection.appendChild(emptyOptionalSlotSection);
-        });
-        unitSection.appendChild(emptySlotSection);
-    }
+    var classCount = {};
+
+    force.units.forEach(function(unit) { 
+        var unitData = getUnitData(unit.unitId);
+        var unitCount = 1;
+        if(classCount.hasOwnProperty(unitData.class)) {
+            unitCount += classCount[unitData.class];
+        }
+        classCount[unitData.class] = unitCount;
+        renderUnit(unit, unitCount, unitSection);
+    });
+
+    var emptySlotSection = document.getElementById("emptySlots");
+    emptySlotSection.innerHTML = "";
+    freeSlots.forEach(freeSlot => {
+        var emptyFreeSlotSection = document.createElement("div");
+        emptyFreeSlotSection.classList.add("emptySlot");
+        emptyFreeSlotSection.classList.add("emptyFreeSlot");
+        emptyFreeSlotSection.innerHTML = "Free: " + displayText[freeSlot];
+        emptySlotSection.appendChild(emptyFreeSlotSection);
+    });
+    requiredSlots.forEach(requiredSlot => {
+        var emptyRequiredSlotSection = document.createElement("div");
+        emptyRequiredSlotSection.classList.add("emptySlot");
+        emptyRequiredSlotSection.classList.add("emptyRequiredSlot");
+        emptyRequiredSlotSection.innerHTML = "⚠ REQUIRED: " + displayText[requiredSlot];
+        emptySlotSection.appendChild(emptyRequiredSlotSection);
+    });
+    optionalSlots.forEach(optionalSlot => {
+        var emptyOptionalSlotSection = document.createElement("div");
+        emptyOptionalSlotSection.classList.add("emptySlot");
+        emptyOptionalSlotSection.classList.add("emptyOptionalSlot");
+        emptyOptionalSlotSection.innerHTML = "Optional: " + displayText[optionalSlot];
+        emptySlotSection.appendChild(emptyOptionalSlotSection);
+    });
 }
 
 function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
@@ -276,11 +324,11 @@ function renderLeader(leader, leaderSection){
     }
     leaderContainer.appendChild(removeButton);
 
-    var leaderNameLabel = document.createElement("span");
-    leaderNameLabel.innerHTML = leaderData.name;
+    var leaderNameLabel = document.createElement("h2");
+    leaderNameLabel.innerHTML = displayText[leaderData.name];
     leaderContainer.appendChild(leaderNameLabel);
 
-    var leaderCostLabel = document.createElement("span");
+    var leaderCostLabel = document.createElement("label");
     leaderCostLabel.innerHTML = "Cost";
     leaderContainer.appendChild(leaderCostLabel);
 
@@ -288,7 +336,7 @@ function renderLeader(leader, leaderSection){
     leaderCostValue.innerHTML = leaderData.cost + "★";
     leaderContainer.appendChild(leaderCostValue);
 
-    var leaderHandLabel = document.createElement("span");
+    var leaderHandLabel = document.createElement("label");
     leaderHandLabel.innerHTML = "Hand";
     leaderContainer.appendChild(leaderHandLabel);
 
@@ -296,7 +344,7 @@ function renderLeader(leader, leaderSection){
     leaderHandValue.innerHTML = leaderData.hand;
     leaderContainer.appendChild(leaderHandValue);
 
-    var leaderPlayLabel = document.createElement("span");
+    var leaderPlayLabel = document.createElement("label");
     leaderPlayLabel.innerHTML = "Play";
     leaderContainer.appendChild(leaderPlayLabel);
 
@@ -307,7 +355,7 @@ function renderLeader(leader, leaderSection){
     leaderSection.appendChild(leaderContainer);
 }
 
-function renderUnit(unit, unitSection){
+function renderUnit(unit, unitCount, unitSection){
     var unitContainer = document.createElement("div");
     unitContainer.classList.add("entry")
     var unitData = getUnitData(unit.unitId);
@@ -332,11 +380,11 @@ function renderUnit(unit, unitSection){
 
     var unitWarningDiv = document.createElement("div");
 
-    var unitNameLabel = document.createElement("span");
-    unitNameLabel.innerHTML = unitData.name;
+    var unitNameLabel = document.createElement("h2");
+    unitNameLabel.innerHTML = displayText[unitData.name] + " " + icons[unitData.class] + indexToLetter[unitCount];
     unitContainer.appendChild(unitNameLabel);
 
-    var unitCostLabel = document.createElement("span");
+    var unitCostLabel = document.createElement("label");
     unitCostLabel.innerHTML = "Cost";
     unitContainer.appendChild(unitCostLabel);
 
@@ -344,17 +392,20 @@ function renderUnit(unit, unitSection){
     unitCostValue.innerHTML = unitData.cost + "★";
     unitContainer.appendChild(unitCostValue);
 
-    var unitClassLabel = document.createElement("span");
+    var unitClassLabel = document.createElement("label");
     unitClassLabel.innerHTML = "Class:";
     unitContainer.appendChild(unitClassLabel);
 
     var unitClassValue = document.createElement("span");
-    unitClassValue.innerHTML = unitData.class;
+    unitClassValue.innerHTML = displayText[unitData.class];
     unitContainer.appendChild(unitClassValue);
+
+    var commanderSection = document.createElement("div");
+    commanderSection.classList.add("commanderSection");
 
     var unitCommanderLabel = document.createElement("span");
     unitCommanderLabel.innerHTML = "Commander:";
-    unitContainer.appendChild(unitCommanderLabel);
+    commanderSection.appendChild(unitCommanderLabel);
 
     var leaderOptions = document.createElement("SELECT");
     leaderOptions.add(new Option("No Commander", null));
@@ -362,7 +413,7 @@ function renderUnit(unit, unitSection){
         var leaderData = getLeaderData(leader.leaderId);
         if((leader.assignedUnit == null  || unit.commander == leader.uniqueCode)
             && canLeaderBeOn(leaderData, unitData)){
-            var option = new Option(leaderData.name, leader.uniqueCode);
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
             leaderOptions.add(option);
         }
     });
@@ -385,13 +436,15 @@ function renderUnit(unit, unitSection){
         }
         updateForce();
     }
-    unitContainer.appendChild(leaderOptions);
+    commanderSection.appendChild(leaderOptions);
 
     if(unit.commander != null){
         var unitCommanderDiv = document.createElement("div");
         renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0), unitCommanderDiv);
-        unitContainer.appendChild(unitCommanderDiv);
+        commanderSection.appendChild(unitCommanderDiv);
     }
+
+    unitContainer.appendChild(commanderSection);
 
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
@@ -466,7 +519,7 @@ function setupOptions(){
 
     factionSelection = document.getElementById("factionSelector");
     factions.forEach(faction =>{
-        var option = new Option(faction, faction);
+        var option = new Option(displayText[faction], faction);
         factionSelection.add(option);
     });
     factionSelection.onchange = function() {
@@ -482,8 +535,10 @@ function setupOptions(){
 
     leaderDropdown = document.createElement("SELECT");
     leaders.forEach(function(leader){
-        var option = new Option(leader.name + " (" + leader.cost + ")", leader.name);
-        leaderDropdown.add(option);
+        if(leader.source == "base") {
+            var option = new Option(displayText[leader.name] + " (" + leader.cost + ")", leader.name);
+            leaderDropdown.add(option);
+        }
     });
     leaderSection.appendChild(leaderDropdown);
 
@@ -501,8 +556,10 @@ function setupOptions(){
 
     unitDropdown = document.createElement("SELECT");
     units.forEach(function(unit){
-        var option = new Option(unit.name + " (" + unit.cost + ")", unit.name);
-        unitDropdown.add(option);
+        if(unit.source == "base"){
+            var option = new Option(displayText[unit.name] + " (" + unit.cost + ")", unit.name);
+            unitDropdown.add(option);
+        }
     });
     unitSection.appendChild(unitDropdown);
 
@@ -538,7 +595,7 @@ function shipsLoaded(json){
 
 function checkClass(ship){
     if(classOrder.indexOf(ship.class) < 0){
-        console.log("No ship class ranked for " + a.class + "of unit " + ship.name);
+        console.log("No ship class ranked for " + ship.class + "of unit " + ship.name);
     }
 }
 
@@ -556,6 +613,10 @@ function upgradesLoaded(json){
 	upgrades = json;
 }
 
+function displayTextLoaded(json){
+    displayText = json;
+}
+
 function initialize()
 {
     var shipsLoadPromise = loadURL("data/ships.json");
@@ -570,7 +631,11 @@ function initialize()
 	upgradesLoadPromise.then(upgradesLoaded);
 	upgradesLoadPromise.catch(function(){alert("upgrades data load failed");});
 
-    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise]).then(_ => {
+    var displayTextPromise = loadURL("data/displayText.json");
+    displayTextPromise.then(displayTextLoaded);
+	displayTextPromise.catch(function(){alert("display text data load failed");});
+
+    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, displayTextPromise]).then(_ => {
         setupOptions();
         setupForce();
         calculateForceCost();

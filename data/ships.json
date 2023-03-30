@@ -18,37 +18,43 @@
                 "purchase":"optional",
                 "count": 4
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"ion-cannon-frigate",
         "class":"frigate",
         "faction":["kushan","taiidan"],
-        "cost":4
+        "cost":4,
+        "source":"base"
     },
     {
         "name":"interceptor",
         "class":"fighter",
         "faction":["kushan", "taiidan"],
-        "cost":3
+        "cost":3,
+        "source":"base"
     },
     {
         "name":"heavy-corvette",
         "class":"corvette",
         "faction":["kushan","taiidan"],
-        "cost":3
+        "cost":3,
+        "source":"base"
     },
     {
         "name":"attack-bomber",
         "class":"fighter",
         "faction":["kushan", "taiidan"],
-        "cost":3
+        "cost":3,
+        "source":"base"
     },
     {
         "name":"assault-frigate",
         "class":"frigate",
         "faction":["kushan", "taiidan"],
-        "cost":5
+        "cost":5,
+        "source":"base"
     },
     {
         "name":"carrier",
@@ -69,49 +75,57 @@
                 "purchase":"optional",
                 "count": 2
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"salvage-corvette",
         "class":"corvette",
         "faction":["kushan","taiidan"],
-        "cost":2
+        "cost":2,
+        "source":"base"
     },
     {
         "name":"space-station",
         "class":"station",
         "faction":["kushan","taiidan"],
-        "cost":5
+        "cost":5,
+        "source":"base"
     },
     {
         "name":"weapons-platform",
         "class":"platform",
         "faction":["kushan","taiidan"],
-        "cost":3
+        "cost":3,
+        "source":"base"
     },
     {
         "name":"scout",
         "class":"fighter",
         "faction":["kushan","taiidan"],
-        "cost":2
+        "cost":2,
+        "source":"base"
     },
     {
         "name":"drone-frigate",
         "class":"frigate",
         "faction":["kushan"],
-        "cost":4
+        "cost":4,
+        "source":"base"
     },
     {
         "name":"field-frigate",
         "class":"frigate",
         "faction":["taiidan"],
-        "cost":4
+        "cost":4,
+        "source":"base"
     },
     {
         "name":"defender",
         "class":"fighter",
         "faction":["kushan","taiidan"],
-        "cost":2
+        "cost":2,
+        "source":"base"
     },
     {
         "name":"multi-gun-corvette",
@@ -129,31 +143,43 @@
         "name":"missile-destroyer",
         "class":"super-capital",
         "faction":["kushan","taiidan"],
-        "cost":6
+        "cost":6,
+        "source":"base"
     },
     {
         "name":"destroyer",
         "class":"super-capital",
         "faction":["kushan","taiidan"],
-        "cost":7
+        "cost":7,
+        "source":"base"
     },
     {
         "name":"cloaked-fighter",
         "class":"fighter",
         "faction":["kushan","taiidan"],
-        "cost":7
+        "cost":7,
+        "source":"campaign"
     },
     {
         "name":"gun-platform",
         "class":"platform",
         "faction":["kushan","taiidan"],
-        "cost":2
+        "cost":2,
+        "source":"campaign"
     },
     {
         "name":"heavy-cruiser",
         "class":"super-capital",
         "faction":["kushan","taiidan"],
-        "cost":12
+        "cost":12,
+        "source":"campaign"
+    },
+    {
+        "name":"field-generator",
+        "class":"station",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign"
     }
 
 ]

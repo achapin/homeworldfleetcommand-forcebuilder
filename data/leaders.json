@@ -15,7 +15,23 @@
                 "class":"frigate",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"base"
+    },
+    {
+        "name":"station-commander",
+        "classAssignment":["station"],
+        "faction":["kushan","taiidan"],
+        "cost":1,
+        "hand":2,
+        "play":1,
+        "slots":[
+            {
+                "class":"station",
+                "purchase":"required"
+            }
+        ],
+        "source":"base"
     },
     {
         "name":"squadron-leader",
@@ -23,7 +39,8 @@
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
-        "play":1
+        "play":1,
+        "source":"base"
     },
     {
         "name":"commander",
@@ -31,7 +48,8 @@
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
-        "play":1
+        "play":1,
+        "source":"base"
     },
     {
         "name":"admiral",
@@ -50,7 +68,8 @@
                 "purchase":"optional",
                 "count":2
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"carrier-captain",
@@ -64,7 +83,8 @@
                 "class":"super-capital",
                 "purchase":"required"
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"wing-commander",
@@ -72,7 +92,8 @@
         "faction":["kushan", "taiidan"],
         "cost":2,
         "hand":2,
-        "play":1
+        "play":1,
+        "source":"base"
     },
     {
         "name":"captain",
@@ -86,7 +107,8 @@
                 "class":"frigate",
                 "purchase":"required"
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"marine-captain",
@@ -100,7 +122,8 @@
                 "class":"frigate",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"marine-commander",
@@ -114,7 +137,8 @@
                 "class":"frigate",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"chief-of-staff",
@@ -130,7 +154,8 @@
                 "count":2
             }
         ],
-        "staff":true
+        "staff":true,
+        "source":"campaign"
     },
     {
         "name":"commodore",
@@ -148,7 +173,8 @@
                 "class":"frigate",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"base"
     },
     {
         "name":"launch-commander",
@@ -162,7 +188,8 @@
                 "class":"super-capital",
                 "purchase":"required"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"recon-commander",
@@ -170,7 +197,8 @@
         "faction":["kushan","taiidan"],
         "cost":2,
         "hand":2,
-        "play":1
+        "play":1,
+        "source":"campaign"
     },
     {
         "name":"strategist",
@@ -192,7 +220,8 @@
                 "class":"frigate",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"hot-shot-pilot",
@@ -200,7 +229,8 @@
         "faction":["kushan","taiidan"],
         "cost":3,
         "hand":2,
-        "play":1
+        "play":1,
+        "source":"campaign"
     },
     {
         "name":"grizzled-veteran",
@@ -214,7 +244,8 @@
                 "class":"frigate",
                 "purchase":"required"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"raid-commander",
@@ -222,7 +253,8 @@
         "faction":["kushan","taiidan"],
         "cost":1,
         "hand":1,
-        "play":1
+        "play":1,
+        "source":"campaign"
     },
     {
         "name":"master-engineer",
@@ -231,6 +263,7 @@
         "cost":2,
         "hand":2,
         "play":1,
-        "staff":true
+        "staff":true,
+        "source":"campaign"
     }
 ]
