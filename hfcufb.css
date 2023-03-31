@@ -60,6 +60,130 @@ span {
     border-radius: 1em;
 }
 
+.identifier {
+    float: right;
+    width: 0px;
+    position: relative;
+    top: 1em;
+}
+
+.shipIcon {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+}
+
+.shipIcon-super-capital {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #FEBD56;
+}
+
+.shipIndex-super-capital {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -1.75em;
+}
+
+.shipIcon-frigate {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #FEBD56;
+}
+
+.shipIndex-frigate {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -2.1em;
+}
+
+.shipIcon-station {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #FEBD56;
+}
+
+.shipIndex-station {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -1.85em;
+}
+
+.shipIcon-corvette {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #3779BA;
+}
+
+.shipIndex-corvette {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -1.6em;
+}
+
+.shipIcon-fighter {
+    float: left;
+    position: relative;
+    font-size: 3em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #3779BA;
+}
+
+.shipIndex-fighter {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -1.75em;
+}
+
+.shipIcon-platform {
+    float: left;
+    position: relative;
+    font-size: 2.5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #3779BA;
+}
+
+.shipIndex-platform {
+    background: none;
+    padding:0px;
+    color: #000022;
+    position: relative;
+    left: -1.5em;
+}
+
 select {
     font-family: "Oxanium-Light";
 }

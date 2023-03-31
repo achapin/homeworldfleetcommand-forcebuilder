@@ -381,7 +381,7 @@ function renderUnit(unit, unitCount, unitSection){
     var unitWarningDiv = document.createElement("div");
 
     var unitNameLabel = document.createElement("h2");
-    unitNameLabel.innerHTML = displayText[unitData.name] + " " + icons[unitData.class] + indexToLetter[unitCount];
+    unitNameLabel.innerHTML = displayText[unitData.name] + " <div class='identifier'><span class='shipIcon-"+unitData.class+"'>" + icons[unitData.class] + "</span><span class='shipIndex-"+unitData.class+"'>" + indexToLetter[unitCount] + "</span></div>";
     unitContainer.appendChild(unitNameLabel);
 
     var unitCostLabel = document.createElement("label");
