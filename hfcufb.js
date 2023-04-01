@@ -33,10 +33,9 @@ var indexToLetter = {
 }
 
 var unitDropdown, leaderDropdown;
-
 var requiredSlots, optionalSlots, freeSlots, unslottedUnits, freeUnits;
-
 var factionSelection;
+var contentCampaign;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -515,6 +514,20 @@ function canLeaderBeOn(leader, unit){
     return matchingAssingment != null;
 }
 
+function changeContentSettings(){
+    var leaderSection = document.getElementById("addLeaderSection")
+    leaderSection.innerHTML = "";
+    var unitSection = document.getElementById("addUnitSection")
+    unitSection.innerHTML = "";
+    setupOptions();
+    //TODO: Evaluate the existing force. Need to remove illegal units/leaders?
+}
+
+function validSource(entry) {
+    return entry.source == "base"
+        || (contentCampaign.checked && entry.source == "campaign");
+}
+
 function setupOptions(){
 
     factionSelection = document.getElementById("factionSelector");
@@ -525,7 +538,6 @@ function setupOptions(){
     factionSelection.onchange = function() {
         force.faction = factionSelection.value;
         updateForce();
-        //Hm. Allow leaders and units from the opposite faction to be included?
     }
 
     var leaderSection = document.getElementById("addLeaderSection")
@@ -535,7 +547,7 @@ function setupOptions(){
 
     leaderDropdown = document.createElement("SELECT");
     leaders.forEach(function(leader){
-        if(leader.source == "base") {
+        if(validSource(leader)) {
             var option = new Option(displayText[leader.name] + " (" + leader.cost + ")", leader.name);
             leaderDropdown.add(option);
         }
@@ -556,7 +568,7 @@ function setupOptions(){
 
     unitDropdown = document.createElement("SELECT");
     units.forEach(function(unit){
-        if(unit.source == "base"){
+        if(validSource(unit)){
             var option = new Option(displayText[unit.name] + " (" + unit.cost + ")", unit.name);
             unitDropdown.add(option);
         }
@@ -619,6 +631,9 @@ function displayTextLoaded(json){
 
 function initialize()
 {
+    contentCampaign = document.getElementById("content-campaign");
+    contentCampaign.addEventListener("click", changeContentSettings)
+
     var shipsLoadPromise = loadURL("data/ships.json");
 	shipsLoadPromise.then(shipsLoaded);
 	shipsLoadPromise.catch(function(){alert("ships data load failed");});
