@@ -310,8 +310,12 @@ function renderLeader(leader, leaderSection){
     removeButton.onclick = function(){
 
         if(leader.assignedUnit != null){
-            leader.assignedUnit.commander = null;
-            //TODO: if staff, remove from staff list
+            if(leaderData.hasOwnProperty("staff")){
+                leader.assignedUnit.staff.splice(leader.assignedUnit.staff.indexOf(leader.uniqueCode),1);
+                leader.assignedUnit = null;
+            } else {
+                leader.assignedUnit.commander = null;
+            }
         }
 
         const index = force.leaders.indexOf(leader);
@@ -411,7 +415,7 @@ function renderUnit(unit, unitCount, unitSection){
     force.leaders.forEach(function(leader){
         var leaderData = getLeaderData(leader.leaderId);
         if((leader.assignedUnit == null  || unit.commander == leader.uniqueCode)
-            && canLeaderBeOn(leaderData, unitData)){
+            && canLeaderBeOn(leaderData, unitData) && !leaderData.hasOwnProperty("staff")){
             var option = new Option(displayText[leaderData.name], leader.uniqueCode);
             leaderOptions.add(option);
         }
@@ -444,6 +448,59 @@ function renderUnit(unit, unitCount, unitSection){
     }
 
     unitContainer.appendChild(commanderSection);
+
+    var unitStaffLabel = document.createElement("span");
+    unitStaffLabel.innerHTML = "Staff:";
+    commanderSection.appendChild(unitStaffLabel);
+
+    var staffOptions = document.createElement("SELECT");
+    var addStaffButton = document.createElement("button");
+    staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+    addStaffButton.disabled = "disabled";
+    force.leaders.forEach(function(leader){
+        addStaffButton.disabled = "enabled";
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null)
+            && canLeaderBeOn(leaderData, unitData) 
+            && leaderData.hasOwnProperty("staff")){
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+            staffOptions.add(option);
+        }
+    });
+    staffOptions.onchange = function() {
+        if(staffOptions.selectedIndex == 0){
+            addStaffButton.disabled = true;
+        } else {
+            addStaffButton.disabled = false;
+        }
+    }
+    commanderSection.appendChild(staffOptions);
+    
+    
+    addStaffButton.innerHTML = "Add Staff";
+    addStaffButton.onclick = function(){
+        var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+        if(!unit.hasOwnProperty("staff")){
+            unit.staff = [];
+        }
+        unit.staff.push(newStaff.uniqueCode);
+        newStaff.assignedUnit = unit;
+        updateForce();
+    }
+    commanderSection.appendChild(addStaffButton);
+
+    if(unit.hasOwnProperty("staff")){
+        unit.staff.forEach(staffId =>{
+            var unitStaffDiv = document.createElement("div");
+            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), unitStaffDiv);
+            commanderSection.appendChild(unitStaffDiv);
+        });
+        if(unit.staff.length > 0 && unit.commander == null){
+            var staffWarningdiv = document.createElement("span");
+            staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+            unitWarningDiv.appendChild(staffWarningdiv);
+        }
+    }
 
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
@@ -520,7 +577,6 @@ function changeContentSettings(){
     var unitSection = document.getElementById("addUnitSection")
     unitSection.innerHTML = "";
     setupOptions();
-    //TODO: Evaluate the existing force. Need to remove illegal units/leaders?
 }
 
 function validSource(entry) {
@@ -632,7 +688,8 @@ function displayTextLoaded(json){
 function initialize()
 {
     contentCampaign = document.getElementById("content-campaign");
-    contentCampaign.addEventListener("click", changeContentSettings)
+    contentCampaign.addEventListener("click", changeContentSettings);
+    contentCampaign.checked = true;
 
     var shipsLoadPromise = loadURL("data/ships.json");
 	shipsLoadPromise.then(shipsLoaded);
