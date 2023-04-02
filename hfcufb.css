@@ -65,6 +65,7 @@ span {
     width: 0px;
     position: relative;
     top: 1em;
+    pointer-events: none;
 }
 
 .shipIcon {
