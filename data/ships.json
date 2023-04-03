@@ -128,10 +128,11 @@
         "source":"base"
     },
     {
-        "name":"multi-gun-corvette",
+        "name":"multigun-corvette",
         "class":"corvette",
         "faction":["kushan","taiidan"],
-        "cost":4
+        "cost":4,
+        "source":"base"
     },
     {
         "name":"light-corvette",

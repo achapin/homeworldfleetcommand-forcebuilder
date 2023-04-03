@@ -175,6 +175,14 @@ function processSlots() {
         if(unitData.hasOwnProperty("slots")){
             addSlots(requiredSlots, optionalSlots, freeSlots, unitData);
         }
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.forEach(upgrade =>{
+                var upgradeData = getUpgradeData(upgrade);
+                if(upgradeData.hasOwnProperty("slots")){
+                    addSlots(requiredSlots, optionalSlots, freeSlots, upgradeData);
+                }
+            })
+        }
     });
 
     //Consume slots lists
@@ -449,57 +457,106 @@ function renderUnit(unit, unitCount, unitSection){
 
     unitContainer.appendChild(commanderSection);
 
-    var unitStaffLabel = document.createElement("span");
-    unitStaffLabel.innerHTML = "Staff:";
-    commanderSection.appendChild(unitStaffLabel);
+    if(contentCampaign.checked){
 
-    var staffOptions = document.createElement("SELECT");
-    var addStaffButton = document.createElement("button");
-    staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
-    addStaffButton.disabled = "disabled";
-    force.leaders.forEach(function(leader){
-        addStaffButton.disabled = "enabled";
-        var leaderData = getLeaderData(leader.leaderId);
-        if((leader.assignedUnit == null)
-            && canLeaderBeOn(leaderData, unitData) 
-            && leaderData.hasOwnProperty("staff")){
-            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
-            staffOptions.add(option);
-        }
-    });
-    staffOptions.onchange = function() {
-        if(staffOptions.selectedIndex == 0){
-            addStaffButton.disabled = true;
-        } else {
-            addStaffButton.disabled = false;
-        }
-    }
-    commanderSection.appendChild(staffOptions);
-    
-    
-    addStaffButton.innerHTML = "Add Staff";
-    addStaffButton.onclick = function(){
-        var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
-        if(!unit.hasOwnProperty("staff")){
-            unit.staff = [];
-        }
-        unit.staff.push(newStaff.uniqueCode);
-        newStaff.assignedUnit = unit;
-        updateForce();
-    }
-    commanderSection.appendChild(addStaffButton);
+        var unitStaffLabel = document.createElement("span");
+        unitStaffLabel.innerHTML = "Staff:";
+        commanderSection.appendChild(unitStaffLabel);
 
-    if(unit.hasOwnProperty("staff")){
-        unit.staff.forEach(staffId =>{
-            var unitStaffDiv = document.createElement("div");
-            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), unitStaffDiv);
-            commanderSection.appendChild(unitStaffDiv);
+        var staffOptions = document.createElement("SELECT");
+        var addStaffButton = document.createElement("button");
+        staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+        addStaffButton.disabled = "disabled";
+        force.leaders.forEach(function(leader){
+            addStaffButton.disabled = "enabled";
+            var leaderData = getLeaderData(leader.leaderId);
+            if((leader.assignedUnit == null)
+                && canLeaderBeOn(leaderData, unitData) 
+                && leaderData.hasOwnProperty("staff")){
+                var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+                staffOptions.add(option);
+            }
         });
-        if(unit.staff.length > 0 && unit.commander == null){
-            var staffWarningdiv = document.createElement("span");
-            staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
-            unitWarningDiv.appendChild(staffWarningdiv);
+        staffOptions.onchange = function() {
+            if(staffOptions.selectedIndex == 0){
+                addStaffButton.disabled = true;
+            } else {
+                addStaffButton.disabled = false;
+            }
         }
+        commanderSection.appendChild(staffOptions);
+        
+        
+        addStaffButton.innerHTML = "Add Staff";
+        addStaffButton.onclick = function(){
+            var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+            if(!unit.hasOwnProperty("staff")){
+                unit.staff = [];
+            }
+            unit.staff.push(newStaff.uniqueCode);
+            newStaff.assignedUnit = unit;
+            updateForce();
+        }
+        commanderSection.appendChild(addStaffButton);
+
+        if(unit.hasOwnProperty("staff")){
+            unit.staff.forEach(staffId =>{
+                var unitStaffDiv = document.createElement("div");
+                renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), unitStaffDiv);
+                commanderSection.appendChild(unitStaffDiv);
+            });
+            if(unit.staff.length > 0 && unit.commander == null){
+                var staffWarningdiv = document.createElement("span");
+                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+                unitWarningDiv.appendChild(staffWarningdiv);
+            }
+        }
+
+        var unitUpgradeDiv = document.createElement("div");
+        var unitUpgradeLabel = document.createElement("span");
+        unitUpgradeLabel.innerHTML = "Upgrades:";
+        unitUpgradeDiv.appendChild(unitUpgradeLabel);
+        var upgradeOptions = document.createElement("SELECT");
+        var addUpgradeButton = document.createElement("button");
+        addUpgradeButton.disabled = "disabled";
+        upgradeOptions.add(new Option("- Select an Upgrade to add -", null));
+        upgrades.forEach(upgrade => {
+            if((!unit.hasOwnProperty("upgrades")
+            || unit.upgrades.indexOf(upgrade.name) < 0)
+            && (upgrade.restriction.localeCompare(unitData.name) == 0
+            || upgrade.restriction.localeCompare(unitData.class) == 0)) {
+                var option = new Option(displayText[upgrade.name] + " (" + upgrade.cost + ")", upgrade.name);
+                upgradeOptions.add(option);
+            }
+        });        
+        upgradeOptions.onchange = function() {
+            if(upgradeOptions.selectedIndex == 0){
+                addUpgradeButton.disabled = true;
+            } else {
+                addUpgradeButton.disabled = false;
+            }
+        }
+        unitUpgradeDiv.appendChild(upgradeOptions);
+        
+        
+        addUpgradeButton.innerHTML = "Add Upgrade";
+        addUpgradeButton.onclick = function(){
+            if(!unit.hasOwnProperty("upgrades")){
+                unit.upgrades = [];
+            }
+            unit.upgrades.push(upgradeOptions.value);
+            updateForce();
+        }
+        unitUpgradeDiv.appendChild(addUpgradeButton);
+
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.sort(compareUpgrade);
+            unit.upgrades.forEach(upgrade => {
+                renderUpgrade(upgrade,unitUpgradeDiv, unit);
+            })
+        }
+
+        unitContainer.appendChild(unitUpgradeDiv);
     }
 
     if(unslottedUnits.indexOf(unit) >= 0){
@@ -519,6 +576,35 @@ function renderUnit(unit, unitCount, unitSection){
     unitSection.appendChild(unitContainer);
 }
 
+function renderUpgrade(upgrade, upgradeSection, unit){
+    var container = document.createElement("div");
+    container.classList.add("entry");
+    var upgradeData = getUpgradeData(upgrade);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Upgrade";
+    removeButton.onclick = function(){
+        unit.upgrades.splice(unit.upgrades.indexOf(upgrade),1);
+        updateForce();
+    }
+    container.appendChild(removeButton);
+
+    var nameLabel = document.createElement("h3");
+    nameLabel.innerHTML = displayText[upgradeData.name];
+    container.appendChild(nameLabel);
+
+    var costLabel = document.createElement("label");
+    costLabel.innerHTML = "Cost";
+    container.appendChild(costLabel);
+
+    var costValue = document.createElement("span");
+    costValue.innerHTML = upgradeData.cost + "★";
+    container.appendChild(costValue);
+
+    upgradeSection.appendChild(container);``
+}
+
 function calculateForceCost(){
 
     //Both Kushan and Taiidan both have 2-hand 1-play as a base
@@ -536,6 +622,12 @@ function calculateForceCost(){
         if(freeUnits.indexOf(unit) < 0){
             var unitData = getUnitData(unit.unitId);
             totalCost += unitData.cost;
+        }
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.forEach(upgrade =>{
+                var upgradeData = getUpgradeData(upgrade);
+                totalCost += upgradeData.cost;
+            })
         }
      });
      
@@ -564,11 +656,30 @@ function getUnitData(unitId){
     return result;
 }
 
+function getUpgradeData(upgradeId) {
+    var result = upgrades.find(upgrade => {
+        return upgrade.name.localeCompare(upgradeId) == 0;
+    });
+    if(result == null) {
+        alert("No upgrade data found for id " + upgradeId);
+    }
+    return result;
+}
+
 function canLeaderBeOn(leader, unit){
     var matchingAssingment = leader.classAssignment.find(allowedClass => 
         unit.class.localeCompare(allowedClass) == 0 
         || unit.name.localeCompare(allowedClass) == 0);
     return matchingAssingment != null;
+}
+
+function compareUpgrade(a,b){
+    var dataA = getUpgradeData(a);
+    var dataB = getUpgradeData(b);
+    if(dataA.cost != dataB.cost){
+        return dataB.cost - dataA.cost;
+    }
+    return dataA.name.localeCompare(dataB.name);
 }
 
 function changeContentSettings(){
@@ -577,6 +688,8 @@ function changeContentSettings(){
     var unitSection = document.getElementById("addUnitSection")
     unitSection.innerHTML = "";
     setupOptions();
+    //TODO: Remove upgrades and staff from units that have them
+    updateForce();
 }
 
 function validSource(entry) {

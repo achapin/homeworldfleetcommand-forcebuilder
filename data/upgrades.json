@@ -2,7 +2,7 @@
     {
         "name":"beast-mode",
         "cost":1,
-        "restriction":"interceptors"
+        "restriction":"interceptor"
     },
     {
         "name":"guided-rounds",
@@ -27,7 +27,7 @@
     {
         "name":"large-hangar-bay",
         "cost":2,
-        "restriction":"super-capital-ship",
+        "restriction":"super-capital",
         "slots":[
             {
                 "class":"fighter",
@@ -42,7 +42,7 @@
     {
         "name":"advanced-point-defence",
         "cost":1,
-        "restriction":"super-capital-ship"
+        "restriction":"super-capital"
     },
     {
         "name":"seeker",
