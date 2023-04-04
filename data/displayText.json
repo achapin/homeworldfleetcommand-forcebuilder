@@ -59,5 +59,18 @@
     "seeker":"Seeker",
     "cruise-missiles":"Cruise Missiles",
     "upgraded-thrusters":"Upgraded Thrusters",
-    "rammer":"Rammer"
+    "rammer":"Rammer",
+    "field-generator":"Field Generator",
+    "shipyard":"Shipyard",
+    "orbital-coordinator":"Orbital Coordinator",
+    "point-defender":"Point Defender",
+    "industrial-world":"Industrial World",
+    "established-colony":"Established Colony",
+    "new-settlement":"New Settlement",
+    "minefield":"Minefield",
+    "starport":"Starport",
+    "hardened-defenses":"Hardened Defenses",
+    "missile-defense":"Missile Defense",
+    "ion-batteries":"Ion Batteries",
+    "orbital-defence-control":"Orbital Defence Control"
 }

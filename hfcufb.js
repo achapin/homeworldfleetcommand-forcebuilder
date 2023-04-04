@@ -2,6 +2,8 @@ var force = {};
 var leaders = [];
 var units = [];
 var upgrades = [];
+var planets = [];
+var facilities = [];
 var displayText = {};
 var factions = ["kushan","taiidan"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
@@ -150,6 +152,10 @@ function addUnit(newUnitId) {
     updateForce();
 }
 
+function addPlanet(newPlanetId) {
+    //TODO: ADD NEW PLANET
+}
+
 function updateForce(){
     processSlots();
     renderEntries();
@@ -184,6 +190,7 @@ function processSlots() {
             })
         }
     });
+    //TODO: Get Slots from planets and facilities
 
     //Consume slots lists
     force.units.forEach(function(unit) { 
@@ -261,6 +268,8 @@ function renderEntries(){
         classCount[unitData.class] = unitCount;
         renderUnit(unit, unitCount, unitSection);
     });
+
+    //TODO: Render planets
 
     var emptySlotSection = document.getElementById("emptySlots");
     emptySlotSection.innerHTML = "";
@@ -750,6 +759,30 @@ function setupOptions(){
         addUnit(unitDropdown.value);
     }
     unitSection.appendChild(unitAddButton);
+
+    var planetSection = document.getElementById("addPlanetSection");
+    if(!contentCampaign.checked){
+        planetSection.classList.add("hidden");
+    } else {
+        planetSection.classList.remove("hidden")
+    }
+    var planetLabel = document.createElement("span");
+    planetLabel.innerHTML = "Planets:";
+    planetSection.appendChild(planetLabel);
+
+    planetDropdown = document.createElement("SELECT");
+    planets.forEach(function(planet){
+        var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
+        planetDropdown.add(option);
+    });
+    planetSection.appendChild(planetDropdown);
+
+    var planetAddButton = document.createElement("button");
+    planetAddButton.innerHTML = "Add Unit";
+    planetAddButton.onclick = function(){
+        addPlanet(planetDropdown.value);
+    }
+    planetSection.appendChild(planetAddButton);
 }
 
 function setupForce(){
@@ -794,6 +827,14 @@ function upgradesLoaded(json){
 	upgrades = json;
 }
 
+function planetsLoaded(json){
+    planets = json;
+}
+
+function facilitiesLoaded(json){
+    facilities = json;
+}
+
 function displayTextLoaded(json){
     displayText = json;
 }
@@ -816,11 +857,19 @@ function initialize()
 	upgradesLoadPromise.then(upgradesLoaded);
 	upgradesLoadPromise.catch(function(){alert("upgrades data load failed");});
 
+    var planetsLoadPromise = loadURL("data/planets.json");
+	planetsLoadPromise.then(planetsLoaded);
+	planetsLoadPromise.catch(function(){alert("planets data load failed");});
+
+    var facilitiesLoadPromise = loadURL("data/facilities.json");
+	facilitiesLoadPromise.then(facilitiesLoaded);
+	facilitiesLoadPromise.catch(function(){alert("facilities data load failed");});
+
     var displayTextPromise = loadURL("data/displayText.json");
     displayTextPromise.then(displayTextLoaded);
 	displayTextPromise.catch(function(){alert("display text data load failed");});
 
-    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, displayTextPromise]).then(_ => {
+    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, planetsLoadPromise, facilitiesLoadPromise, displayTextPromise]).then(_ => {
         setupOptions();
         setupForce();
         calculateForceCost();
