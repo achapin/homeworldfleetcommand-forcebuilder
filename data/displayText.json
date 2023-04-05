@@ -72,5 +72,7 @@
     "hardened-defenses":"Hardened Defenses",
     "missile-defense":"Missile Defense",
     "ion-batteries":"Ion Batteries",
-    "orbital-defence-control":"Orbital Defence Control"
+    "orbital-defence-control":"Orbital Defence Control",
+    "ion-controller":"Ion Controller",
+    "prison-station":"Prison Station"
 }

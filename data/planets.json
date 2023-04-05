@@ -2,6 +2,7 @@
     {
         "name":"industrial-world",
         "cost":4,
+        "class":"planet",
         "slots":[
             {
                 "class":"facility",
@@ -22,6 +23,7 @@
     {
         "name":"established-colony",
         "cost":2,
+        "class":"planet",
         "slots":[
             {
                 "class":"facility",
@@ -41,6 +43,7 @@
     {
         "name":"new-settlement",
         "cost":2,
+        "class":"planet",
         "slots":[
             {
                 "class":"facility",

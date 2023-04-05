@@ -153,7 +153,13 @@ function addUnit(newUnitId) {
 }
 
 function addPlanet(newPlanetId) {
-    //TODO: ADD NEW PLANET
+    var newEntry = new PlanetEntry();
+    newEntry.planetId = newPlanetId;
+    if(!force.hasOwnProperty("planets")){
+        force.planets = [];
+    }
+    force.planets.push(newEntry);
+    updateForce();
 }
 
 function updateForce(){
@@ -269,7 +275,11 @@ function renderEntries(){
         renderUnit(unit, unitCount, unitSection);
     });
 
-    //TODO: Render planets
+    if(force.hasOwnProperty("planets")){
+        force.planets.forEach(function(planet){
+            renderPlanet(planet, unitSection);
+        });
+    }
 
     var emptySlotSection = document.getElementById("emptySlots");
     emptySlotSection.innerHTML = "";
@@ -611,7 +621,236 @@ function renderUpgrade(upgrade, upgradeSection, unit){
     costValue.innerHTML = upgradeData.cost + "★";
     container.appendChild(costValue);
 
-    upgradeSection.appendChild(container);``
+    upgradeSection.appendChild(container);
+}
+
+function renderPlanet(planet, section) {
+    var planetContainer = document.createElement("div");
+    planetContainer.classList.add("entry")
+    var planetData = getPlanetData(planet.planetId);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Planet";
+    removeButton.onclick = function(){
+
+        if(planet.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        const index = force.planets.indexOf(planet);
+        if(index > -1){
+            force.planets.splice(index, 1);
+        }
+        updateForce();
+    }
+    planetContainer.appendChild(removeButton);
+
+    var planetWarningDiv = document.createElement("div");
+
+    var planetNameLabel = document.createElement("h2");
+    planetNameLabel.innerHTML = displayText[planetData.name] + " <div class='identifier'><span class='shipIcon-station'>" + icons["station"] + "</span></div>";
+    planetContainer.appendChild(planetNameLabel);
+
+    var planetCostLabel = document.createElement("label");
+    planetCostLabel.innerHTML = "Cost";
+    planetContainer.appendChild(planetCostLabel);
+
+    var planetCostValue = document.createElement("span");
+    planetCostValue.innerHTML = planetData.cost + "★";
+    planetContainer.appendChild(planetCostValue);
+
+    var planetClassLabel = document.createElement("label");
+    planetClassLabel.innerHTML = "Class:";
+    planetContainer.appendChild(planetClassLabel);
+
+    var planetClassValue = document.createElement("span");
+    planetClassValue.innerHTML = "Planet";
+    planetContainer.appendChild(planetClassValue);
+
+    var commanderSection = document.createElement("div");
+    commanderSection.classList.add("commanderSection");
+
+    var planetCommanderLabel = document.createElement("span");
+    planetCommanderLabel.innerHTML = "Commander:";
+    commanderSection.appendChild(planetCommanderLabel);
+
+    var leaderOptions = document.createElement("SELECT");
+    leaderOptions.add(new Option("No Commander", null));
+    force.leaders.forEach(function(leader){
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null  || planet.commander == leader.uniqueCode)
+            && canLeaderBeOn(leaderData, planetData) && !leaderData.hasOwnProperty("staff")){
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+            leaderOptions.add(option);
+        }
+    });
+    if(planet.commander != null){
+        leaderOptions.value = planet.commander;
+    }
+    leaderOptions.onchange = function(){
+
+        if(planet.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        if(leaderOptions.selectedIndex == 0){
+            planet.commander = null;
+        } else {
+            var assignedLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(leaderOptions.value) == 0);
+            planet.commander = assignedLeader.uniqueCode;
+            assignedLeader.assignedUnit = planet;
+        }
+        updateForce();
+    }
+    commanderSection.appendChild(leaderOptions);
+
+    if(planet.commander != null){
+        var planetCommanderDiv = document.createElement("div");
+        renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0), planetCommanderDiv);
+        commanderSection.appendChild(planetCommanderDiv);
+    }
+
+    planetContainer.appendChild(commanderSection);
+
+    var planetStaffLabel = document.createElement("span");
+    planetStaffLabel.innerHTML = "Staff:";
+    commanderSection.appendChild(planetStaffLabel);
+
+    var staffOptions = document.createElement("SELECT");
+    var addStaffButton = document.createElement("button");
+    staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+    addStaffButton.disabled = "disabled";
+    force.leaders.forEach(function(leader){
+        addStaffButton.disabled = "enabled";
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null)
+            && canLeaderBeOn(leaderData, planetData) 
+            && leaderData.hasOwnProperty("staff")){
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+            staffOptions.add(option);
+        }
+    });
+    staffOptions.onchange = function() {
+        if(staffOptions.selectedIndex == 0){
+            addStaffButton.disabled = true;
+        } else {
+            addStaffButton.disabled = false;
+        }
+    }
+    commanderSection.appendChild(staffOptions);
+    
+    addStaffButton.innerHTML = "Add Staff";
+    addStaffButton.onclick = function(){
+        var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+        if(!planet.hasOwnProperty("staff")){
+            planet.staff = [];
+        }
+        planet.staff.push(newStaff.uniqueCode);
+        newStaff.assignedUnit = planet;
+        updateForce();
+    }
+    commanderSection.appendChild(addStaffButton);
+
+    if(planet.hasOwnProperty("staff")){
+        planet.staff.forEach(staffId =>{
+            var planetStaffDiv = document.createElement("div");
+            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), planetStaffDiv);
+            commanderSection.appendChild(planetStaffDiv);
+        });
+        if(planet.staff.length > 0 && planet.commander == null){
+            var staffWarningdiv = document.createElement("span");
+            staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+            planetWarningDiv.appendChild(staffWarningdiv);
+        }
+    }
+
+    var planetfacilityDiv = document.createElement("div");
+    var planetfacilityLabel = document.createElement("span");
+    planetfacilityLabel.innerHTML = "Facilities:";
+    planetfacilityDiv.appendChild(planetfacilityLabel);
+    var facilityOptions = document.createElement("SELECT");
+    var addfacilityButton = document.createElement("button");
+    addfacilityButton.disabled = "disabled";
+    facilityOptions.add(new Option("- Select a Facility to add -", null));
+    facilities.forEach(facility => {
+        if(!planet.hasOwnProperty("facilities")) {
+            var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+            facilityOptions.add(option);
+        } else {
+            var currentCount = 0;
+            planet.facilities.forEach(localFacility => {
+                if(localFacility.localeCompare(facility.name) == 0) {
+                    currentCount++;
+                }
+            });
+            if(currentCount < facility.max) {
+                var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+                facilityOptions.add(option);
+            }
+        }
+    });        
+    facilityOptions.onchange = function() {
+        if(facilityOptions.selectedIndex == 0){
+            addfacilityButton.disabled = true;
+        } else {
+            addfacilityButton.disabled = false;
+        }
+    }
+    planetfacilityDiv.appendChild(facilityOptions);
+
+    addfacilityButton.innerHTML = "Add facility";
+    addfacilityButton.onclick = function(){
+        if(!planet.hasOwnProperty("facilities")){
+            planet.facilities = [];
+        }
+        planet.facilities.push(facilityOptions.value);
+        updateForce();
+    }
+    planetfacilityDiv.appendChild(addfacilityButton);
+
+    planetContainer.appendChild(planetfacilityDiv);
+
+    if(planet.hasOwnProperty("facilities")){
+        planet.facilities.sort(compareFacility);
+        planet.facilities.forEach(facility => {
+            renderFacility(facility,planetfacilityDiv, planet);
+        })
+    }
+    //TODO: SHOW AND RENDER FACILITY SLOTS ON THE PLANET
+
+    section.appendChild(planetContainer);
+}
+
+function renderFacility(facility,facilitySection, planet) {
+    var container = document.createElement("div");
+    container.classList.add("entry");
+    var facilityData = getFacilityData(facility);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Facility";
+    removeButton.onclick = function(){
+        planet.facilities.splice(planet.facilities.indexOf(facility),1);
+        updateForce();
+    }
+    container.appendChild(removeButton);
+
+    var nameLabel = document.createElement("h3");
+    nameLabel.innerHTML = displayText[facilityData.name];
+    container.appendChild(nameLabel);
+
+    var costLabel = document.createElement("label");
+    costLabel.innerHTML = "Cost";
+    container.appendChild(costLabel);
+
+    var costValue = document.createElement("span");
+    costValue.innerHTML = facilityData.cost + "★";
+    container.appendChild(costValue);
+
+    facilitySection.appendChild(container);
 }
 
 function calculateForceCost(){
@@ -646,31 +885,31 @@ function calculateForceCost(){
 }
 
 function getLeaderData(leaderId){
-    var result = leaders.find(leader => {
-        return leader.name.localeCompare(leaderId) == 0;
-    });
-    if(result == null) {
-        alert("No leader data found for id " + leader);
-    }
-    return result;
+    return getData(leaderId, leaders);
 }
 
 function getUnitData(unitId){
-    var result = units.find(unit => {
-        return unit.name.localeCompare(unitId) == 0;
-    });
-    if(result == null) {
-        alert("No unit data found for id " + unitId);
-    }
-    return result;
+    return getData(unitId, units);
 }
 
 function getUpgradeData(upgradeId) {
-    var result = upgrades.find(upgrade => {
-        return upgrade.name.localeCompare(upgradeId) == 0;
+    return getData(upgradeId, upgrades);
+}
+
+function getPlanetData(planetId) {
+    return getData(planetId, planets);
+}
+
+function getFacilityData(facilityId) {
+    return getData(facilityId, facilities);
+}
+
+function getData(key, collection){
+    var result = collection.find(entry => {
+        return entry.name.localeCompare(key) == 0;
     });
     if(result == null) {
-        alert("No upgrade data found for id " + upgradeId);
+        alert("No upgrade data found for id " + key);
     }
     return result;
 }
@@ -691,13 +930,29 @@ function compareUpgrade(a,b){
     return dataA.name.localeCompare(dataB.name);
 }
 
+function compareFacility(a,b) {
+    var dataA = getFacilityData(a);
+    var dataB = getFacilityData(b);
+    return compareFacilities(dataA, dataB);
+}
+
+function compareFacilities(dataA,dataB){
+    if(dataA.cost != dataB.cost){
+        return dataB.cost - dataA.cost;
+    }
+    if(dataA.max != dataB.max){
+        return dataB.max - dataA.max;
+    }
+    return dataA.name.localeCompare(dataB.name);
+}
+
 function changeContentSettings(){
     var leaderSection = document.getElementById("addLeaderSection")
     leaderSection.innerHTML = "";
     var unitSection = document.getElementById("addUnitSection")
     unitSection.innerHTML = "";
     setupOptions();
-    //TODO: Remove upgrades and staff from units that have them
+    //TODO: Remove upgrades and staff from units that have them, and planets
     updateForce();
 }
 
@@ -778,7 +1033,7 @@ function setupOptions(){
     planetSection.appendChild(planetDropdown);
 
     var planetAddButton = document.createElement("button");
-    planetAddButton.innerHTML = "Add Unit";
+    planetAddButton.innerHTML = "Add Planet";
     planetAddButton.onclick = function(){
         addPlanet(planetDropdown.value);
     }
@@ -870,10 +1125,27 @@ function initialize()
 	displayTextPromise.catch(function(){alert("display text data load failed");});
 
     Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, planetsLoadPromise, facilitiesLoadPromise, displayTextPromise]).then(_ => {
+        facilities.sort(compareFacilities);
+        checkDisplayText();
         setupOptions();
         setupForce();
         calculateForceCost();
     });
+}
+
+function checkDisplayText() {
+    var missing = [];
+    toCheck = [units, leaders, planets, upgrades, facilities];
+    toCheck.forEach(category => {
+        category.forEach(entry => {
+            if(!displayText.hasOwnProperty(entry.name)){
+                missing.push(entry.name);
+            }
+        })
+    });
+    if(missing.length > 0){
+        console.log("Missing display text " + missing);
+    }
 }
 
 class UnitEntry {
@@ -887,4 +1159,11 @@ class LeaderEntry{
     leaderId = "";
     assignedUnit = null;
     uniqueCode = "";
+}
+
+class PlanetEntry {
+    planetId = "";
+    commander = null;
+    staff = [];
+    facilities = [];
 }
