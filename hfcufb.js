@@ -196,9 +196,32 @@ function processSlots() {
             })
         }
     });
-    //TODO: Get Slots from planets and facilities
+    force.planets.forEach(planet => {
+        var planetData = getPlanetData(planet.planetId);
+        if(planetData.hasOwnProperty("slots")){
+            addSlots(requiredSlots, optionalSlots, freeSlots, planetData);
+        }
+        if(planet.hasOwnProperty("facilities")){
+            planet.facilities.forEach(facility =>{
+                var facilityData = getFacilityData(facility);
+                if(facilityData.hasOwnProperty("slots")){
+                    addSlots(requiredSlots, optionalSlots, freeSlots, facilityData);
+                }
+            })
+        }
+    });
 
     //Consume slots lists
+    while(freeSlots.indexOf('facility') >= 0){
+        freeSlots.splice(freeSlots.indexOf('facility'), 1);
+    }
+    while(requiredSlots.indexOf('facility') >= 0){
+        requiredSlots.splice(requiredSlots.indexOf('facility'), 1);
+    }
+    while(optionalSlots.indexOf('facility') >= 0){
+        optionalSlots.splice(optionalSlots.indexOf('facility'), 1);
+    }
+
     force.units.forEach(function(unit) { 
         var unitData = getUnitData(unit.unitId);
         if(freeSlots.indexOf(unitData.name) >= 0){
@@ -283,21 +306,25 @@ function renderEntries(){
 
     var emptySlotSection = document.getElementById("emptySlots");
     emptySlotSection.innerHTML = "";
-    freeSlots.forEach(freeSlot => {
+    renderEmptySlots(freeSlots, requiredSlots, optionalSlots, emptySlotSection);
+}
+
+function renderEmptySlots(free, required, optional, emptySlotSection) {
+    free.forEach(freeSlot => {
         var emptyFreeSlotSection = document.createElement("div");
         emptyFreeSlotSection.classList.add("emptySlot");
         emptyFreeSlotSection.classList.add("emptyFreeSlot");
         emptyFreeSlotSection.innerHTML = "Free: " + displayText[freeSlot];
         emptySlotSection.appendChild(emptyFreeSlotSection);
     });
-    requiredSlots.forEach(requiredSlot => {
+    required.forEach(requiredSlot => {
         var emptyRequiredSlotSection = document.createElement("div");
         emptyRequiredSlotSection.classList.add("emptySlot");
         emptyRequiredSlotSection.classList.add("emptyRequiredSlot");
         emptyRequiredSlotSection.innerHTML = "⚠ REQUIRED: " + displayText[requiredSlot];
         emptySlotSection.appendChild(emptyRequiredSlotSection);
     });
-    optionalSlots.forEach(optionalSlot => {
+    optional.forEach(optionalSlot => {
         var emptyOptionalSlotSection = document.createElement("div");
         emptyOptionalSlotSection.classList.add("emptySlot");
         emptyOptionalSlotSection.classList.add("emptyOptionalSlot");
@@ -306,7 +333,7 @@ function renderEntries(){
     });
 }
 
-function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
+function addSlots(required, optional, free, entryData) {
     entryData.slots.forEach(slot => {
         var slotCount = 1;
         if(slot.hasOwnProperty("count")) {
@@ -314,13 +341,13 @@ function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
         }
         for(var slotIndex = 0; slotIndex < slotCount; slotIndex++){
             if(slot.purchase == "free"){
-                freeSlots.push(slot.class);
+                free.push(slot.class);
             }
             if(slot.purchase == "required"){
-                requiredSlots.push(slot.class);
+                required.push(slot.class);
             }
             if(slot.purchase == "optional"){
-                optionalSlots.push(slot.class);
+                optional.push(slot.class);
             }
         }
     });
@@ -650,7 +677,7 @@ function renderPlanet(planet, section) {
     var planetWarningDiv = document.createElement("div");
 
     var planetNameLabel = document.createElement("h2");
-    planetNameLabel.innerHTML = displayText[planetData.name] + " <div class='identifier'><span class='shipIcon-station'>" + icons["station"] + "</span></div>";
+    planetNameLabel.innerHTML = displayText[planetData.name] + " <div class='identifier'><span class='shipIcon-planet'>" + icons["station"] + "</span></div>";
     planetContainer.appendChild(planetNameLabel);
 
     var planetCostLabel = document.createElement("label");
@@ -767,6 +794,41 @@ function renderPlanet(planet, section) {
         }
     }
 
+    var planetRequiredSlots = [];
+    var planetOptionalSlots = [];
+    var planetFreeSlots = []
+
+    addSlots(planetRequiredSlots, planetOptionalSlots, planetFreeSlots, planetData);
+
+    planet.facilities.forEach(facility => { 
+        if(planetFreeSlots.length > 0){
+            planetFreeSlots.splice(0, 1);
+            return;
+        }
+        if(planetRequiredSlots.length > 0){
+            planetRequiredSlots.splice(0, 1);
+            return;
+        }
+        if(planetOptionalSlots.length > 0){
+            planetOptionalSlots.splice(0, 1);
+            return;
+        }
+        console.log("Could not remove facility " + facility + " from Free:[" + planetFreeSlots + "] Required:[" + planetRequiredSlots + "] Optional:[" + planetOptionalSlots +"]");
+    });
+
+    //We only need to show slots for this specific planet. Units are covered by the force as a whole
+    classOrder.forEach(shipClass => {
+        while(planetFreeSlots.indexOf(shipClass) >= 0){
+            planetFreeSlots.splice(planetFreeSlots.indexOf(shipClass), 1);
+        }
+        while(planetRequiredSlots.indexOf(shipClass) >= 0){
+            planetRequiredSlots.splice(planetRequiredSlots.indexOf(shipClass), 1);
+        }
+        while(planetOptionalSlots.indexOf(shipClass) >= 0){
+            planetOptionalSlots.splice(planetOptionalSlots.indexOf(shipClass), 1);
+        }
+    });
+
     var planetfacilityDiv = document.createElement("div");
     var planetfacilityLabel = document.createElement("span");
     planetfacilityLabel.innerHTML = "Facilities:";
@@ -775,23 +837,25 @@ function renderPlanet(planet, section) {
     var addfacilityButton = document.createElement("button");
     addfacilityButton.disabled = "disabled";
     facilityOptions.add(new Option("- Select a Facility to add -", null));
-    facilities.forEach(facility => {
-        if(!planet.hasOwnProperty("facilities")) {
-            var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
-            facilityOptions.add(option);
-        } else {
-            var currentCount = 0;
-            planet.facilities.forEach(localFacility => {
-                if(localFacility.localeCompare(facility.name) == 0) {
-                    currentCount++;
-                }
-            });
-            if(currentCount < facility.max) {
+    if(planetFreeSlots.length > 0 || planetRequiredSlots.length > 0 || planetOptionalSlots.length > 0){
+        facilities.forEach(facility => {
+            if(!planet.hasOwnProperty("facilities")) {
                 var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
                 facilityOptions.add(option);
+            } else {
+                var currentCount = 0;
+                planet.facilities.forEach(localFacility => {
+                    if(localFacility.localeCompare(facility.name) == 0) {
+                        currentCount++;
+                    }
+                });
+                if(currentCount < facility.max) {
+                    var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+                    facilityOptions.add(option);
+                }
             }
-        }
-    });        
+        });
+}
     facilityOptions.onchange = function() {
         if(facilityOptions.selectedIndex == 0){
             addfacilityButton.disabled = true;
@@ -819,7 +883,11 @@ function renderPlanet(planet, section) {
             renderFacility(facility,planetfacilityDiv, planet);
         })
     }
-    //TODO: SHOW AND RENDER FACILITY SLOTS ON THE PLANET
+
+    var emptySlotSection = document.createElement("div");
+    renderEmptySlots(planetFreeSlots, planetRequiredSlots, planetOptionalSlots, emptySlotSection);
+
+    planetContainer.appendChild(emptySlotSection);
 
     section.appendChild(planetContainer);
 }
@@ -878,6 +946,19 @@ function calculateForceCost(){
             })
         }
      });
+
+     if(force.hasOwnProperty("planets")){
+        force.planets.forEach(planet => {
+            var planetData = getPlanetData(planet.planetId);
+            totalCost += planetData.cost;
+            if(planet.hasOwnProperty("facilities")){
+                planet.facilities.forEach(facility => {
+                    var facilityData = getFacilityData(facility);
+                    totalCost += facilityData.cost;
+                });
+            }
+        });
+     }
      
      document.getElementById("forceCost").innerHTML = totalCost + "★";
      document.getElementById("totalHand").innerHTML = totalHand;
