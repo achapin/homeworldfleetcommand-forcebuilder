@@ -1034,6 +1034,7 @@ function changeContentSettings(){
     unitSection.innerHTML = "";
     setupOptions();
     //TODO: Remove upgrades and staff from units that have them, and planets
+    console.log("Remove upgrades and staff from units that have them, and planets");
     updateForce();
 }
 
