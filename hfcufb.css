@@ -350,3 +350,7 @@ button {
 .hidden {
     visibility: hidden;
 }
+
+.noDisplay {
+    display: none;
+}

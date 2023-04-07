@@ -86,8 +86,13 @@ function loadForce(forceName) {
     document.getElementById("forceName").value = forceName.substring(0,forceNameLength);
     force.units = forceJson.units;
     force.leaders = forceJson.leaders;
+    if(forceJson.hasOwnProperty("planets")){
+        force.planets = forceJson.planets;
+    }
     force.faction = forceJson.faction;
     factionSelection.value = force.faction;
+    contentCampaign.checked = forceJson.useCampaign;
+    setupOptions();
     updateForce();
 }
 
@@ -196,20 +201,22 @@ function processSlots() {
             })
         }
     });
+    if(force.hasOwnProperty("planets")){
     force.planets.forEach(planet => {
-        var planetData = getPlanetData(planet.planetId);
-        if(planetData.hasOwnProperty("slots")){
-            addSlots(requiredSlots, optionalSlots, freeSlots, planetData);
-        }
-        if(planet.hasOwnProperty("facilities")){
-            planet.facilities.forEach(facility =>{
-                var facilityData = getFacilityData(facility);
-                if(facilityData.hasOwnProperty("slots")){
-                    addSlots(requiredSlots, optionalSlots, freeSlots, facilityData);
-                }
-            })
-        }
-    });
+            var planetData = getPlanetData(planet.planetId);
+            if(planetData.hasOwnProperty("slots")){
+                addSlots(requiredSlots, optionalSlots, freeSlots, planetData);
+            }
+            if(planet.hasOwnProperty("facilities")){
+                planet.facilities.forEach(facility =>{
+                    var facilityData = getFacilityData(facility);
+                    if(facilityData.hasOwnProperty("slots")){
+                        addSlots(requiredSlots, optionalSlots, freeSlots, facilityData);
+                    }
+                })
+            }
+        });
+    }
 
     //Consume slots lists
     while(freeSlots.indexOf('facility') >= 0){
@@ -362,21 +369,7 @@ function renderLeader(leader, leaderSection){
     removeButton.classList.add("removeButton");
     removeButton.innerHTML = "Remove Leader";
     removeButton.onclick = function(){
-
-        if(leader.assignedUnit != null){
-            if(leaderData.hasOwnProperty("staff")){
-                leader.assignedUnit.staff.splice(leader.assignedUnit.staff.indexOf(leader.uniqueCode),1);
-                leader.assignedUnit = null;
-            } else {
-                leader.assignedUnit.commander = null;
-            }
-        }
-
-        const index = force.leaders.indexOf(leader);
-        if(index > -1){
-            force.leaders.splice(index, 1);
-        }
-
+        removeLeader(leader);
         updateForce();
     }
     leaderContainer.appendChild(removeButton);
@@ -412,6 +405,23 @@ function renderLeader(leader, leaderSection){
     leaderSection.appendChild(leaderContainer);
 }
 
+function removeLeader(leader) {
+    var leaderData = getLeaderData(leader.leaderId);
+    if(leader.assignedUnit != null){
+        if(leaderData.hasOwnProperty("staff")){
+            leader.assignedUnit.staff.splice(leader.assignedUnit.staff.indexOf(leader.uniqueCode),1);
+            leader.assignedUnit = null;
+        } else {
+            leader.assignedUnit.commander = null;
+        }
+    }
+
+    const index = force.leaders.indexOf(leader);
+    if(index > -1){
+        force.leaders.splice(index, 1);
+    }
+}
+
 function renderUnit(unit, unitCount, unitSection){
     var unitContainer = document.createElement("div");
     unitContainer.classList.add("entry")
@@ -421,16 +431,7 @@ function renderUnit(unit, unitCount, unitSection){
     removeButton.classList.add("removeButton");
     removeButton.innerHTML = "Remove Unit";
     removeButton.onclick = function(){
-
-        if(unit.commander != null){
-            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
-            currentLeader.assignedUnit = null;
-        }
-
-        const index = force.units.indexOf(unit);
-        if(index > -1){
-            force.units.splice(index, 1);
-        }
+        removeUnit(unit);
         updateForce();
     }
     unitContainer.appendChild(removeButton);
@@ -620,6 +621,18 @@ function renderUnit(unit, unitCount, unitSection){
     unitContainer.appendChild(unitWarningDiv);
 
     unitSection.appendChild(unitContainer);
+}
+
+function removeUnit(unit) {
+    if(unit.commander != null){
+        var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
+        currentLeader.assignedUnit = null;
+    }
+
+    const index = force.units.indexOf(unit);
+    if(index > -1){
+        force.units.splice(index, 1);
+    }
 }
 
 function renderUpgrade(upgrade, upgradeSection, unit){
@@ -1028,13 +1041,29 @@ function compareFacilities(dataA,dataB){
 }
 
 function changeContentSettings(){
+    force.useCampaign = contentCampaign.checked;
     var leaderSection = document.getElementById("addLeaderSection")
     leaderSection.innerHTML = "";
     var unitSection = document.getElementById("addUnitSection")
     unitSection.innerHTML = "";
+    var planetSection = document.getElementById("addPlanetSection")
+    planetSection.innerHTML = "";
     setupOptions();
-    //TODO: Remove upgrades and staff from units that have them, and planets
-    console.log("Remove upgrades and staff from units that have them, and planets");
+    force.leaders.forEach(leader => {
+        var leaderData = getLeaderData(leader.leaderId);
+        if(leaderData.source == "campaign"){
+            removeLeader(leader);
+        }
+    });
+    force.units.forEach(unit => {
+        var unitData = getUnitData(unit.unitId);
+        if(unitData.source == "campaign"){
+            removeUnit(unit);
+        } else {
+            delete(unit.upgrades);
+        }
+    })
+    delete(force.planets);
     updateForce();
 }
 
@@ -1099,9 +1128,9 @@ function setupOptions(){
 
     var planetSection = document.getElementById("addPlanetSection");
     if(!contentCampaign.checked){
-        planetSection.classList.add("hidden");
+        planetSection.classList.add("noDisplay");
     } else {
-        planetSection.classList.remove("hidden")
+        planetSection.classList.remove("noDisplay")
     }
     var planetLabel = document.createElement("span");
     planetLabel.innerHTML = "Planets:";
@@ -1126,6 +1155,7 @@ function setupForce(){
     force.faction = factionSelection.value;
     force.leaders = [];
     force.units = [];
+    force.planets = [];
 }
 
 function shipsLoaded(json){
