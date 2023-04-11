@@ -1210,7 +1210,6 @@ function initialize()
 {
     contentCampaign = document.getElementById("content-campaign");
     contentCampaign.addEventListener("click", changeContentSettings);
-    contentCampaign.checked = true;
 
     var shipsLoadPromise = loadURL("data/ships.json");
 	shipsLoadPromise.then(shipsLoaded);
