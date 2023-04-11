@@ -2,6 +2,8 @@ var force = {};
 var leaders = [];
 var units = [];
 var upgrades = [];
+var planets = [];
+var facilities = [];
 var displayText = {};
 var factions = ["kushan","taiidan"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
@@ -33,10 +35,9 @@ var indexToLetter = {
 }
 
 var unitDropdown, leaderDropdown;
-
 var requiredSlots, optionalSlots, freeSlots, unslottedUnits, freeUnits;
-
 var factionSelection;
+var contentCampaign;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -85,8 +86,13 @@ function loadForce(forceName) {
     document.getElementById("forceName").value = forceName.substring(0,forceNameLength);
     force.units = forceJson.units;
     force.leaders = forceJson.leaders;
+    if(forceJson.hasOwnProperty("planets")){
+        force.planets = forceJson.planets;
+    }
     force.faction = forceJson.faction;
     factionSelection.value = force.faction;
+    contentCampaign.checked = forceJson.useCampaign;
+    setupOptions();
     updateForce();
 }
 
@@ -151,6 +157,16 @@ function addUnit(newUnitId) {
     updateForce();
 }
 
+function addPlanet(newPlanetId) {
+    var newEntry = new PlanetEntry();
+    newEntry.planetId = newPlanetId;
+    if(!force.hasOwnProperty("planets")){
+        force.planets = [];
+    }
+    force.planets.push(newEntry);
+    updateForce();
+}
+
 function updateForce(){
     processSlots();
     renderEntries();
@@ -176,9 +192,43 @@ function processSlots() {
         if(unitData.hasOwnProperty("slots")){
             addSlots(requiredSlots, optionalSlots, freeSlots, unitData);
         }
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.forEach(upgrade =>{
+                var upgradeData = getUpgradeData(upgrade);
+                if(upgradeData.hasOwnProperty("slots")){
+                    addSlots(requiredSlots, optionalSlots, freeSlots, upgradeData);
+                }
+            })
+        }
     });
+    if(force.hasOwnProperty("planets")){
+    force.planets.forEach(planet => {
+            var planetData = getPlanetData(planet.planetId);
+            if(planetData.hasOwnProperty("slots")){
+                addSlots(requiredSlots, optionalSlots, freeSlots, planetData);
+            }
+            if(planet.hasOwnProperty("facilities")){
+                planet.facilities.forEach(facility =>{
+                    var facilityData = getFacilityData(facility);
+                    if(facilityData.hasOwnProperty("slots")){
+                        addSlots(requiredSlots, optionalSlots, freeSlots, facilityData);
+                    }
+                })
+            }
+        });
+    }
 
     //Consume slots lists
+    while(freeSlots.indexOf('facility') >= 0){
+        freeSlots.splice(freeSlots.indexOf('facility'), 1);
+    }
+    while(requiredSlots.indexOf('facility') >= 0){
+        requiredSlots.splice(requiredSlots.indexOf('facility'), 1);
+    }
+    while(optionalSlots.indexOf('facility') >= 0){
+        optionalSlots.splice(optionalSlots.indexOf('facility'), 1);
+    }
+
     force.units.forEach(function(unit) { 
         var unitData = getUnitData(unit.unitId);
         if(freeSlots.indexOf(unitData.name) >= 0){
@@ -255,23 +305,33 @@ function renderEntries(){
         renderUnit(unit, unitCount, unitSection);
     });
 
+    if(force.hasOwnProperty("planets")){
+        force.planets.forEach(function(planet){
+            renderPlanet(planet, unitSection);
+        });
+    }
+
     var emptySlotSection = document.getElementById("emptySlots");
     emptySlotSection.innerHTML = "";
-    freeSlots.forEach(freeSlot => {
+    renderEmptySlots(freeSlots, requiredSlots, optionalSlots, emptySlotSection);
+}
+
+function renderEmptySlots(free, required, optional, emptySlotSection) {
+    free.forEach(freeSlot => {
         var emptyFreeSlotSection = document.createElement("div");
         emptyFreeSlotSection.classList.add("emptySlot");
         emptyFreeSlotSection.classList.add("emptyFreeSlot");
         emptyFreeSlotSection.innerHTML = "Free: " + displayText[freeSlot];
         emptySlotSection.appendChild(emptyFreeSlotSection);
     });
-    requiredSlots.forEach(requiredSlot => {
+    required.forEach(requiredSlot => {
         var emptyRequiredSlotSection = document.createElement("div");
         emptyRequiredSlotSection.classList.add("emptySlot");
         emptyRequiredSlotSection.classList.add("emptyRequiredSlot");
         emptyRequiredSlotSection.innerHTML = "⚠ REQUIRED: " + displayText[requiredSlot];
         emptySlotSection.appendChild(emptyRequiredSlotSection);
     });
-    optionalSlots.forEach(optionalSlot => {
+    optional.forEach(optionalSlot => {
         var emptyOptionalSlotSection = document.createElement("div");
         emptyOptionalSlotSection.classList.add("emptySlot");
         emptyOptionalSlotSection.classList.add("emptyOptionalSlot");
@@ -280,7 +340,7 @@ function renderEntries(){
     });
 }
 
-function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
+function addSlots(required, optional, free, entryData) {
     entryData.slots.forEach(slot => {
         var slotCount = 1;
         if(slot.hasOwnProperty("count")) {
@@ -288,13 +348,13 @@ function addSlots(requiredSlots, optionalSlots, freeSlots, entryData) {
         }
         for(var slotIndex = 0; slotIndex < slotCount; slotIndex++){
             if(slot.purchase == "free"){
-                freeSlots.push(slot.class);
+                free.push(slot.class);
             }
             if(slot.purchase == "required"){
-                requiredSlots.push(slot.class);
+                required.push(slot.class);
             }
             if(slot.purchase == "optional"){
-                optionalSlots.push(slot.class);
+                optional.push(slot.class);
             }
         }
     });
@@ -309,17 +369,7 @@ function renderLeader(leader, leaderSection){
     removeButton.classList.add("removeButton");
     removeButton.innerHTML = "Remove Leader";
     removeButton.onclick = function(){
-
-        if(leader.assignedUnit != null){
-            leader.assignedUnit.commander = null;
-            //TODO: if staff, remove from staff list
-        }
-
-        const index = force.leaders.indexOf(leader);
-        if(index > -1){
-            force.leaders.splice(index, 1);
-        }
-
+        removeLeader(leader);
         updateForce();
     }
     leaderContainer.appendChild(removeButton);
@@ -355,6 +405,23 @@ function renderLeader(leader, leaderSection){
     leaderSection.appendChild(leaderContainer);
 }
 
+function removeLeader(leader) {
+    var leaderData = getLeaderData(leader.leaderId);
+    if(leader.assignedUnit != null){
+        if(leaderData.hasOwnProperty("staff")){
+            leader.assignedUnit.staff.splice(leader.assignedUnit.staff.indexOf(leader.uniqueCode),1);
+            leader.assignedUnit = null;
+        } else {
+            leader.assignedUnit.commander = null;
+        }
+    }
+
+    const index = force.leaders.indexOf(leader);
+    if(index > -1){
+        force.leaders.splice(index, 1);
+    }
+}
+
 function renderUnit(unit, unitCount, unitSection){
     var unitContainer = document.createElement("div");
     unitContainer.classList.add("entry")
@@ -364,16 +431,7 @@ function renderUnit(unit, unitCount, unitSection){
     removeButton.classList.add("removeButton");
     removeButton.innerHTML = "Remove Unit";
     removeButton.onclick = function(){
-
-        if(unit.commander != null){
-            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
-            currentLeader.assignedUnit = null;
-        }
-
-        const index = force.units.indexOf(unit);
-        if(index > -1){
-            force.units.splice(index, 1);
-        }
+        removeUnit(unit);
         updateForce();
     }
     unitContainer.appendChild(removeButton);
@@ -412,7 +470,7 @@ function renderUnit(unit, unitCount, unitSection){
     force.leaders.forEach(function(leader){
         var leaderData = getLeaderData(leader.leaderId);
         if((leader.assignedUnit == null  || unit.commander == leader.uniqueCode)
-            && canLeaderBeOn(leaderData, unitData)){
+            && canLeaderBeOn(leaderData, unitData) && !leaderData.hasOwnProperty("staff")){
             var option = new Option(displayText[leaderData.name], leader.uniqueCode);
             leaderOptions.add(option);
         }
@@ -446,6 +504,108 @@ function renderUnit(unit, unitCount, unitSection){
 
     unitContainer.appendChild(commanderSection);
 
+    if(contentCampaign.checked){
+
+        var unitStaffLabel = document.createElement("span");
+        unitStaffLabel.innerHTML = "Staff:";
+        commanderSection.appendChild(unitStaffLabel);
+
+        var staffOptions = document.createElement("SELECT");
+        var addStaffButton = document.createElement("button");
+        staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+        addStaffButton.disabled = "disabled";
+        force.leaders.forEach(function(leader){
+            addStaffButton.disabled = "enabled";
+            var leaderData = getLeaderData(leader.leaderId);
+            if((leader.assignedUnit == null)
+                && canLeaderBeOn(leaderData, unitData) 
+                && leaderData.hasOwnProperty("staff")){
+                var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+                staffOptions.add(option);
+            }
+        });
+        staffOptions.onchange = function() {
+            if(staffOptions.selectedIndex == 0){
+                addStaffButton.disabled = true;
+            } else {
+                addStaffButton.disabled = false;
+            }
+        }
+        commanderSection.appendChild(staffOptions);
+        
+        
+        addStaffButton.innerHTML = "Add Staff";
+        addStaffButton.onclick = function(){
+            var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+            if(!unit.hasOwnProperty("staff")){
+                unit.staff = [];
+            }
+            unit.staff.push(newStaff.uniqueCode);
+            newStaff.assignedUnit = unit;
+            updateForce();
+        }
+        commanderSection.appendChild(addStaffButton);
+
+        if(unit.hasOwnProperty("staff")){
+            unit.staff.forEach(staffId =>{
+                var unitStaffDiv = document.createElement("div");
+                renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), unitStaffDiv);
+                commanderSection.appendChild(unitStaffDiv);
+            });
+            if(unit.staff.length > 0 && unit.commander == null){
+                var staffWarningdiv = document.createElement("span");
+                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+                unitWarningDiv.appendChild(staffWarningdiv);
+            }
+        }
+
+        var unitUpgradeDiv = document.createElement("div");
+        var unitUpgradeLabel = document.createElement("span");
+        unitUpgradeLabel.innerHTML = "Upgrades:";
+        unitUpgradeDiv.appendChild(unitUpgradeLabel);
+        var upgradeOptions = document.createElement("SELECT");
+        var addUpgradeButton = document.createElement("button");
+        addUpgradeButton.disabled = "disabled";
+        upgradeOptions.add(new Option("- Select an Upgrade to add -", null));
+        upgrades.forEach(upgrade => {
+            if((!unit.hasOwnProperty("upgrades")
+            || unit.upgrades.indexOf(upgrade.name) < 0)
+            && (upgrade.restriction.localeCompare(unitData.name) == 0
+            || upgrade.restriction.localeCompare(unitData.class) == 0)) {
+                var option = new Option(displayText[upgrade.name] + " (" + upgrade.cost + ")", upgrade.name);
+                upgradeOptions.add(option);
+            }
+        });        
+        upgradeOptions.onchange = function() {
+            if(upgradeOptions.selectedIndex == 0){
+                addUpgradeButton.disabled = true;
+            } else {
+                addUpgradeButton.disabled = false;
+            }
+        }
+        unitUpgradeDiv.appendChild(upgradeOptions);
+        
+        
+        addUpgradeButton.innerHTML = "Add Upgrade";
+        addUpgradeButton.onclick = function(){
+            if(!unit.hasOwnProperty("upgrades")){
+                unit.upgrades = [];
+            }
+            unit.upgrades.push(upgradeOptions.value);
+            updateForce();
+        }
+        unitUpgradeDiv.appendChild(addUpgradeButton);
+
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.sort(compareUpgrade);
+            unit.upgrades.forEach(upgrade => {
+                renderUpgrade(upgrade,unitUpgradeDiv, unit);
+            })
+        }
+
+        unitContainer.appendChild(unitUpgradeDiv);
+    }
+
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
         slotWarningdiv.innerHTML = "⚠ This Unit is not in any available slot"
@@ -461,6 +621,317 @@ function renderUnit(unit, unitCount, unitSection){
     unitContainer.appendChild(unitWarningDiv);
 
     unitSection.appendChild(unitContainer);
+}
+
+function removeUnit(unit) {
+    if(unit.commander != null){
+        var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(unit.commander) == 0);
+        currentLeader.assignedUnit = null;
+    }
+
+    const index = force.units.indexOf(unit);
+    if(index > -1){
+        force.units.splice(index, 1);
+    }
+}
+
+function renderUpgrade(upgrade, upgradeSection, unit){
+    var container = document.createElement("div");
+    container.classList.add("entry");
+    var upgradeData = getUpgradeData(upgrade);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Upgrade";
+    removeButton.onclick = function(){
+        unit.upgrades.splice(unit.upgrades.indexOf(upgrade),1);
+        updateForce();
+    }
+    container.appendChild(removeButton);
+
+    var nameLabel = document.createElement("h3");
+    nameLabel.innerHTML = displayText[upgradeData.name];
+    container.appendChild(nameLabel);
+
+    var costLabel = document.createElement("label");
+    costLabel.innerHTML = "Cost";
+    container.appendChild(costLabel);
+
+    var costValue = document.createElement("span");
+    costValue.innerHTML = upgradeData.cost + "★";
+    container.appendChild(costValue);
+
+    upgradeSection.appendChild(container);
+}
+
+function renderPlanet(planet, section) {
+    var planetContainer = document.createElement("div");
+    planetContainer.classList.add("entry")
+    var planetData = getPlanetData(planet.planetId);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Planet";
+    removeButton.onclick = function(){
+
+        if(planet.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        const index = force.planets.indexOf(planet);
+        if(index > -1){
+            force.planets.splice(index, 1);
+        }
+        updateForce();
+    }
+    planetContainer.appendChild(removeButton);
+
+    var planetWarningDiv = document.createElement("div");
+
+    var planetNameLabel = document.createElement("h2");
+    planetNameLabel.innerHTML = displayText[planetData.name] + " <div class='identifier'><span class='shipIcon-planet'>" + icons["station"] + "</span></div>";
+    planetContainer.appendChild(planetNameLabel);
+
+    var planetCostLabel = document.createElement("label");
+    planetCostLabel.innerHTML = "Cost";
+    planetContainer.appendChild(planetCostLabel);
+
+    var planetCostValue = document.createElement("span");
+    planetCostValue.innerHTML = planetData.cost + "★";
+    planetContainer.appendChild(planetCostValue);
+
+    var planetClassLabel = document.createElement("label");
+    planetClassLabel.innerHTML = "Class:";
+    planetContainer.appendChild(planetClassLabel);
+
+    var planetClassValue = document.createElement("span");
+    planetClassValue.innerHTML = "Planet";
+    planetContainer.appendChild(planetClassValue);
+
+    var commanderSection = document.createElement("div");
+    commanderSection.classList.add("commanderSection");
+
+    var planetCommanderLabel = document.createElement("span");
+    planetCommanderLabel.innerHTML = "Commander:";
+    commanderSection.appendChild(planetCommanderLabel);
+
+    var leaderOptions = document.createElement("SELECT");
+    leaderOptions.add(new Option("No Commander", null));
+    force.leaders.forEach(function(leader){
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null  || planet.commander == leader.uniqueCode)
+            && canLeaderBeOn(leaderData, planetData) && !leaderData.hasOwnProperty("staff")){
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+            leaderOptions.add(option);
+        }
+    });
+    if(planet.commander != null){
+        leaderOptions.value = planet.commander;
+    }
+    leaderOptions.onchange = function(){
+
+        if(planet.commander != null){
+            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
+            currentLeader.assignedUnit = null;
+        }
+
+        if(leaderOptions.selectedIndex == 0){
+            planet.commander = null;
+        } else {
+            var assignedLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(leaderOptions.value) == 0);
+            planet.commander = assignedLeader.uniqueCode;
+            assignedLeader.assignedUnit = planet;
+        }
+        updateForce();
+    }
+    commanderSection.appendChild(leaderOptions);
+
+    if(planet.commander != null){
+        var planetCommanderDiv = document.createElement("div");
+        renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0), planetCommanderDiv);
+        commanderSection.appendChild(planetCommanderDiv);
+    }
+
+    planetContainer.appendChild(commanderSection);
+
+    var planetStaffLabel = document.createElement("span");
+    planetStaffLabel.innerHTML = "Staff:";
+    commanderSection.appendChild(planetStaffLabel);
+
+    var staffOptions = document.createElement("SELECT");
+    var addStaffButton = document.createElement("button");
+    staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+    addStaffButton.disabled = "disabled";
+    force.leaders.forEach(function(leader){
+        addStaffButton.disabled = "enabled";
+        var leaderData = getLeaderData(leader.leaderId);
+        if((leader.assignedUnit == null)
+            && canLeaderBeOn(leaderData, planetData) 
+            && leaderData.hasOwnProperty("staff")){
+            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+            staffOptions.add(option);
+        }
+    });
+    staffOptions.onchange = function() {
+        if(staffOptions.selectedIndex == 0){
+            addStaffButton.disabled = true;
+        } else {
+            addStaffButton.disabled = false;
+        }
+    }
+    commanderSection.appendChild(staffOptions);
+    
+    addStaffButton.innerHTML = "Add Staff";
+    addStaffButton.onclick = function(){
+        var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+        if(!planet.hasOwnProperty("staff")){
+            planet.staff = [];
+        }
+        planet.staff.push(newStaff.uniqueCode);
+        newStaff.assignedUnit = planet;
+        updateForce();
+    }
+    commanderSection.appendChild(addStaffButton);
+
+    if(planet.hasOwnProperty("staff")){
+        planet.staff.forEach(staffId =>{
+            var planetStaffDiv = document.createElement("div");
+            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), planetStaffDiv);
+            commanderSection.appendChild(planetStaffDiv);
+        });
+        if(planet.staff.length > 0 && planet.commander == null){
+            var staffWarningdiv = document.createElement("span");
+            staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+            planetWarningDiv.appendChild(staffWarningdiv);
+        }
+    }
+
+    var planetRequiredSlots = [];
+    var planetOptionalSlots = [];
+    var planetFreeSlots = []
+
+    addSlots(planetRequiredSlots, planetOptionalSlots, planetFreeSlots, planetData);
+
+    planet.facilities.forEach(facility => { 
+        if(planetFreeSlots.length > 0){
+            planetFreeSlots.splice(0, 1);
+            return;
+        }
+        if(planetRequiredSlots.length > 0){
+            planetRequiredSlots.splice(0, 1);
+            return;
+        }
+        if(planetOptionalSlots.length > 0){
+            planetOptionalSlots.splice(0, 1);
+            return;
+        }
+        console.log("Could not remove facility " + facility + " from Free:[" + planetFreeSlots + "] Required:[" + planetRequiredSlots + "] Optional:[" + planetOptionalSlots +"]");
+    });
+
+    //We only need to show slots for this specific planet. Units are covered by the force as a whole
+    classOrder.forEach(shipClass => {
+        while(planetFreeSlots.indexOf(shipClass) >= 0){
+            planetFreeSlots.splice(planetFreeSlots.indexOf(shipClass), 1);
+        }
+        while(planetRequiredSlots.indexOf(shipClass) >= 0){
+            planetRequiredSlots.splice(planetRequiredSlots.indexOf(shipClass), 1);
+        }
+        while(planetOptionalSlots.indexOf(shipClass) >= 0){
+            planetOptionalSlots.splice(planetOptionalSlots.indexOf(shipClass), 1);
+        }
+    });
+
+    var planetfacilityDiv = document.createElement("div");
+    var planetfacilityLabel = document.createElement("span");
+    planetfacilityLabel.innerHTML = "Facilities:";
+    planetfacilityDiv.appendChild(planetfacilityLabel);
+    var facilityOptions = document.createElement("SELECT");
+    var addfacilityButton = document.createElement("button");
+    addfacilityButton.disabled = "disabled";
+    facilityOptions.add(new Option("- Select a Facility to add -", null));
+    if(planetFreeSlots.length > 0 || planetRequiredSlots.length > 0 || planetOptionalSlots.length > 0){
+        facilities.forEach(facility => {
+            if(!planet.hasOwnProperty("facilities")) {
+                var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+                facilityOptions.add(option);
+            } else {
+                var currentCount = 0;
+                planet.facilities.forEach(localFacility => {
+                    if(localFacility.localeCompare(facility.name) == 0) {
+                        currentCount++;
+                    }
+                });
+                if(currentCount < facility.max) {
+                    var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+                    facilityOptions.add(option);
+                }
+            }
+        });
+}
+    facilityOptions.onchange = function() {
+        if(facilityOptions.selectedIndex == 0){
+            addfacilityButton.disabled = true;
+        } else {
+            addfacilityButton.disabled = false;
+        }
+    }
+    planetfacilityDiv.appendChild(facilityOptions);
+
+    addfacilityButton.innerHTML = "Add facility";
+    addfacilityButton.onclick = function(){
+        if(!planet.hasOwnProperty("facilities")){
+            planet.facilities = [];
+        }
+        planet.facilities.push(facilityOptions.value);
+        updateForce();
+    }
+    planetfacilityDiv.appendChild(addfacilityButton);
+
+    planetContainer.appendChild(planetfacilityDiv);
+
+    if(planet.hasOwnProperty("facilities")){
+        planet.facilities.sort(compareFacility);
+        planet.facilities.forEach(facility => {
+            renderFacility(facility,planetfacilityDiv, planet);
+        })
+    }
+
+    var emptySlotSection = document.createElement("div");
+    renderEmptySlots(planetFreeSlots, planetRequiredSlots, planetOptionalSlots, emptySlotSection);
+
+    planetContainer.appendChild(emptySlotSection);
+
+    section.appendChild(planetContainer);
+}
+
+function renderFacility(facility,facilitySection, planet) {
+    var container = document.createElement("div");
+    container.classList.add("entry");
+    var facilityData = getFacilityData(facility);
+
+    var removeButton = document.createElement("button");
+    removeButton.classList.add("removeButton");
+    removeButton.innerHTML = "Remove Facility";
+    removeButton.onclick = function(){
+        planet.facilities.splice(planet.facilities.indexOf(facility),1);
+        updateForce();
+    }
+    container.appendChild(removeButton);
+
+    var nameLabel = document.createElement("h3");
+    nameLabel.innerHTML = displayText[facilityData.name];
+    container.appendChild(nameLabel);
+
+    var costLabel = document.createElement("label");
+    costLabel.innerHTML = "Cost";
+    container.appendChild(costLabel);
+
+    var costValue = document.createElement("span");
+    costValue.innerHTML = facilityData.cost + "★";
+    container.appendChild(costValue);
+
+    facilitySection.appendChild(container);
 }
 
 function calculateForceCost(){
@@ -481,7 +952,26 @@ function calculateForceCost(){
             var unitData = getUnitData(unit.unitId);
             totalCost += unitData.cost;
         }
+        if(unit.hasOwnProperty("upgrades")){
+            unit.upgrades.forEach(upgrade =>{
+                var upgradeData = getUpgradeData(upgrade);
+                totalCost += upgradeData.cost;
+            })
+        }
      });
+
+     if(force.hasOwnProperty("planets")){
+        force.planets.forEach(planet => {
+            var planetData = getPlanetData(planet.planetId);
+            totalCost += planetData.cost;
+            if(planet.hasOwnProperty("facilities")){
+                planet.facilities.forEach(facility => {
+                    var facilityData = getFacilityData(facility);
+                    totalCost += facilityData.cost;
+                });
+            }
+        });
+     }
      
      document.getElementById("forceCost").innerHTML = totalCost + "★";
      document.getElementById("totalHand").innerHTML = totalHand;
@@ -489,21 +979,31 @@ function calculateForceCost(){
 }
 
 function getLeaderData(leaderId){
-    var result = leaders.find(leader => {
-        return leader.name.localeCompare(leaderId) == 0;
-    });
-    if(result == null) {
-        alert("No leader data found for id " + leader);
-    }
-    return result;
+    return getData(leaderId, leaders);
 }
 
 function getUnitData(unitId){
-    var result = units.find(unit => {
-        return unit.name.localeCompare(unitId) == 0;
+    return getData(unitId, units);
+}
+
+function getUpgradeData(upgradeId) {
+    return getData(upgradeId, upgrades);
+}
+
+function getPlanetData(planetId) {
+    return getData(planetId, planets);
+}
+
+function getFacilityData(facilityId) {
+    return getData(facilityId, facilities);
+}
+
+function getData(key, collection){
+    var result = collection.find(entry => {
+        return entry.name.localeCompare(key) == 0;
     });
     if(result == null) {
-        alert("No unit data found for id " + unitId);
+        alert("No upgrade data found for id " + key);
     }
     return result;
 }
@@ -513,6 +1013,63 @@ function canLeaderBeOn(leader, unit){
         unit.class.localeCompare(allowedClass) == 0 
         || unit.name.localeCompare(allowedClass) == 0);
     return matchingAssingment != null;
+}
+
+function compareUpgrade(a,b){
+    var dataA = getUpgradeData(a);
+    var dataB = getUpgradeData(b);
+    if(dataA.cost != dataB.cost){
+        return dataB.cost - dataA.cost;
+    }
+    return dataA.name.localeCompare(dataB.name);
+}
+
+function compareFacility(a,b) {
+    var dataA = getFacilityData(a);
+    var dataB = getFacilityData(b);
+    return compareFacilities(dataA, dataB);
+}
+
+function compareFacilities(dataA,dataB){
+    if(dataA.cost != dataB.cost){
+        return dataB.cost - dataA.cost;
+    }
+    if(dataA.max != dataB.max){
+        return dataB.max - dataA.max;
+    }
+    return dataA.name.localeCompare(dataB.name);
+}
+
+function changeContentSettings(){
+    force.useCampaign = contentCampaign.checked;
+    var leaderSection = document.getElementById("addLeaderSection")
+    leaderSection.innerHTML = "";
+    var unitSection = document.getElementById("addUnitSection")
+    unitSection.innerHTML = "";
+    var planetSection = document.getElementById("addPlanetSection")
+    planetSection.innerHTML = "";
+    setupOptions();
+    force.leaders.forEach(leader => {
+        var leaderData = getLeaderData(leader.leaderId);
+        if(leaderData.source == "campaign"){
+            removeLeader(leader);
+        }
+    });
+    force.units.forEach(unit => {
+        var unitData = getUnitData(unit.unitId);
+        if(unitData.source == "campaign"){
+            removeUnit(unit);
+        } else {
+            delete(unit.upgrades);
+        }
+    })
+    delete(force.planets);
+    updateForce();
+}
+
+function validSource(entry) {
+    return entry.source == "base"
+        || (contentCampaign.checked && entry.source == "campaign");
 }
 
 function setupOptions(){
@@ -525,7 +1082,6 @@ function setupOptions(){
     factionSelection.onchange = function() {
         force.faction = factionSelection.value;
         updateForce();
-        //Hm. Allow leaders and units from the opposite faction to be included?
     }
 
     var leaderSection = document.getElementById("addLeaderSection")
@@ -535,7 +1091,7 @@ function setupOptions(){
 
     leaderDropdown = document.createElement("SELECT");
     leaders.forEach(function(leader){
-        if(leader.source == "base") {
+        if(validSource(leader)) {
             var option = new Option(displayText[leader.name] + " (" + leader.cost + ")", leader.name);
             leaderDropdown.add(option);
         }
@@ -556,7 +1112,7 @@ function setupOptions(){
 
     unitDropdown = document.createElement("SELECT");
     units.forEach(function(unit){
-        if(unit.source == "base"){
+        if(validSource(unit)){
             var option = new Option(displayText[unit.name] + " (" + unit.cost + ")", unit.name);
             unitDropdown.add(option);
         }
@@ -569,12 +1125,37 @@ function setupOptions(){
         addUnit(unitDropdown.value);
     }
     unitSection.appendChild(unitAddButton);
+
+    var planetSection = document.getElementById("addPlanetSection");
+    if(!contentCampaign.checked){
+        planetSection.classList.add("noDisplay");
+    } else {
+        planetSection.classList.remove("noDisplay")
+    }
+    var planetLabel = document.createElement("span");
+    planetLabel.innerHTML = "Planets:";
+    planetSection.appendChild(planetLabel);
+
+    planetDropdown = document.createElement("SELECT");
+    planets.forEach(function(planet){
+        var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
+        planetDropdown.add(option);
+    });
+    planetSection.appendChild(planetDropdown);
+
+    var planetAddButton = document.createElement("button");
+    planetAddButton.innerHTML = "Add Planet";
+    planetAddButton.onclick = function(){
+        addPlanet(planetDropdown.value);
+    }
+    planetSection.appendChild(planetAddButton);
 }
 
 function setupForce(){
     force.faction = factionSelection.value;
     force.leaders = [];
     force.units = [];
+    force.planets = [];
 }
 
 function shipsLoaded(json){
@@ -613,12 +1194,24 @@ function upgradesLoaded(json){
 	upgrades = json;
 }
 
+function planetsLoaded(json){
+    planets = json;
+}
+
+function facilitiesLoaded(json){
+    facilities = json;
+}
+
 function displayTextLoaded(json){
     displayText = json;
 }
 
 function initialize()
 {
+    contentCampaign = document.getElementById("content-campaign");
+    contentCampaign.addEventListener("click", changeContentSettings);
+    contentCampaign.checked = true;
+
     var shipsLoadPromise = loadURL("data/ships.json");
 	shipsLoadPromise.then(shipsLoaded);
 	shipsLoadPromise.catch(function(){alert("ships data load failed");});
@@ -631,15 +1224,40 @@ function initialize()
 	upgradesLoadPromise.then(upgradesLoaded);
 	upgradesLoadPromise.catch(function(){alert("upgrades data load failed");});
 
+    var planetsLoadPromise = loadURL("data/planets.json");
+	planetsLoadPromise.then(planetsLoaded);
+	planetsLoadPromise.catch(function(){alert("planets data load failed");});
+
+    var facilitiesLoadPromise = loadURL("data/facilities.json");
+	facilitiesLoadPromise.then(facilitiesLoaded);
+	facilitiesLoadPromise.catch(function(){alert("facilities data load failed");});
+
     var displayTextPromise = loadURL("data/displayText.json");
     displayTextPromise.then(displayTextLoaded);
 	displayTextPromise.catch(function(){alert("display text data load failed");});
 
-    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, displayTextPromise]).then(_ => {
+    Promise.all([shipsLoadPromise, leadersLoadPromise, upgradesLoadPromise, planetsLoadPromise, facilitiesLoadPromise, displayTextPromise]).then(_ => {
+        facilities.sort(compareFacilities);
+        checkDisplayText();
         setupOptions();
         setupForce();
         calculateForceCost();
     });
+}
+
+function checkDisplayText() {
+    var missing = [];
+    toCheck = [units, leaders, planets, upgrades, facilities];
+    toCheck.forEach(category => {
+        category.forEach(entry => {
+            if(!displayText.hasOwnProperty(entry.name)){
+                missing.push(entry.name);
+            }
+        })
+    });
+    if(missing.length > 0){
+        console.log("Missing display text " + missing);
+    }
 }
 
 class UnitEntry {
@@ -653,4 +1271,11 @@ class LeaderEntry{
     leaderId = "";
     assignedUnit = null;
     uniqueCode = "";
+}
+
+class PlanetEntry {
+    planetId = "";
+    commander = null;
+    staff = [];
+    facilities = [];
 }

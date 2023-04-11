@@ -6,11 +6,11 @@
         "cost":7,
         "slots": [
             {
-                "class":"interceptor",
+                "class":"fighter",
                 "purchase":"free"
             },
             {
-                "class":"interceptor",
+                "class":"fighter",
                 "purchase":"optional"
             },
             {
@@ -63,11 +63,11 @@
         "cost":5,
         "slots": [
             {
-                "class":"interceptor",
+                "class":"fighter",
                 "purchase":"free"
             },
             {
-                "class":"interceptor",
+                "class":"fighter",
                 "purchase":"optional"
             },
             {
@@ -128,10 +128,11 @@
         "source":"base"
     },
     {
-        "name":"multi-gun-corvette",
+        "name":"multigun-corvette",
         "class":"corvette",
         "faction":["kushan","taiidan"],
-        "cost":4
+        "cost":4,
+        "source":"base"
     },
     {
         "name":"light-corvette",
@@ -180,6 +181,38 @@
         "faction":["kushan","taiidan"],
         "cost":2,
         "source":"campaign"
+    },
+    {
+        "name":"prison-station",
+        "class":"station",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign",
+        "slots": [
+            {
+                "class":"fighter",
+                "purchase":"required",
+                "count":2
+            },
+            {
+                "class":"platform",
+                "purchase":"optional",
+                "count": 3
+            }
+        ]
+    },
+    {
+        "name":"shipyard",
+        "class":"station",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign",
+        "slots": [
+            {
+                "class":"platform",
+                "purchase":"optional"
+            }
+        ]
     }
 
 ]

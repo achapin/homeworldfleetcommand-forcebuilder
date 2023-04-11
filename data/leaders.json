@@ -1,5 +1,14 @@
 [
     {
+        "name":"FAKEOUT",
+        "classAssignment":["fighter"],
+        "faction":["kushan", "taiidan"],
+        "cost":10,
+        "hand":1,
+        "play":1,
+        "source":"DUMMY"
+    },
+    {
         "name":"vice-admiral",
         "classAssignment":["super-capital","station"],
         "faction":["kushan","taiidan"],
@@ -73,7 +82,7 @@
     },
     {
         "name":"carrier-captain",
-        "classAssignment":["carrier"],
+        "classAssignment":["carrier","mothership"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
@@ -264,6 +273,33 @@
         "hand":2,
         "play":1,
         "staff":true,
+        "source":"campaign"
+    },
+    {
+        "name":"ion-controller",
+        "classAssignment":["station","platform","planet"],
+        "faction":["kushan", "taiidan"],
+        "cost":2,
+        "hand":3,
+        "play":2,
+        "source":"campaign"
+    },
+    {
+        "name":"orbital-coordinator",
+        "classAssignment":["station","planet"],
+        "faction":["kushan", "taiidan"],
+        "cost":2,
+        "hand":3,
+        "play":2,
+        "source":"campaign"
+    },
+    {
+        "name":"point-defender",
+        "classAssignment":["station","platform","planet"],
+        "faction":["kushan", "taiidan"],
+        "cost":1,
+        "hand":1,
+        "play":1,
         "source":"campaign"
     }
 ]

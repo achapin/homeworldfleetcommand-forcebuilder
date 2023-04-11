@@ -113,6 +113,16 @@ span {
     left: -2.1em;
 }
 
+.shipIcon-planet {
+    float: left;
+    position: relative;
+    font-size: 5em;
+    background: none;
+    top: -.55em;
+    padding: 0px;
+    color: #c42847;
+}
+
 .shipIcon-station {
     float: left;
     position: relative;
@@ -340,4 +350,8 @@ button {
 
 .hidden {
     visibility: hidden;
+}
+
+.noDisplay {
+    display: none;
 }

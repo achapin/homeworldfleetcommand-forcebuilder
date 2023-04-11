@@ -1,0 +1,59 @@
+[
+    {
+        "name":"industrial-world",
+        "cost":4,
+        "class":"planet",
+        "slots":[
+            {
+                "class":"facility",
+                "purchase":"required",
+                "count": 3
+            },
+            {
+                "class":"facility",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"fighter",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"established-colony",
+        "cost":2,
+        "class":"planet",
+        "slots":[
+            {
+                "class":"facility",
+                "purchase":"required"
+            },
+            {
+                "class":"facility",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"fighter",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"new-settlement",
+        "cost":2,
+        "class":"planet",
+        "slots":[
+            {
+                "class":"facility",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"fighter",
+                "purchase":"optional"
+            }
+        ]
+    }
+]
