@@ -355,3 +355,11 @@ button {
 .noDisplay {
     display: none;
 }
+
+#plugs {
+    float: right;
+}
+
+#plugs span {
+    margin: .5em;
+}
