@@ -154,16 +154,37 @@
         "classAssignment":["super-capital"],
         "faction":["kushan", "taiidan"],
         "cost":1,
+        "medals":1,
         "hand":0,
         "play":1,
         "slots":[
             {
+                "class":"super-capital",
+                "purchase":"optional"
+            },
+            {
                 "class":"frigate",
-                "purchase":"optional",
-                "count":2
+                "purchase":"optional"
             }
         ],
         "staff":true,
+        "source":"campaign"
+    },
+    {
+        "name":"veteran-captain",
+        "classAssignment":["frigate"],
+        "faction":["taiidan"],
+        "type":"hero",
+        "cost":3,
+        "medals":3,
+        "hand":3,
+        "play":2,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"required"
+            }
+        ],
         "source":"campaign"
     },
     {
@@ -188,8 +209,10 @@
     {
         "name":"launch-commander",
         "classAssignment":["carrier"],
-        "faction":["kushan","taiidan"],
+        "faction":["taiidan"],
+        "type":"hero",
         "cost":3,
+        "medals":1,
         "hand":2,
         "play":1,
         "slots":[
@@ -201,19 +224,58 @@
         "source":"campaign"
     },
     {
+        "name":"hunter",
+        "classAssignment":["super-capital"],
+        "faction":["taiidan"],
+        "type":"hero",
+        "cost":4,
+        "medals":2,
+        "hand":6,
+        "play":3,
+        "slots":[
+            {
+                "class":"super-capital",
+                "purchase":"required"
+            },
+            {
+                "class":"super-capital",
+                "purchase":"optional"
+            },
+            {
+                "class":"frigate",
+                "purchase":"optional"
+            }
+        ],
+        "source":"campaign"
+    },
+    {
         "name":"recon-commander",
         "classAssignment":["corvette"],
-        "faction":["kushan","taiidan"],
+        "faction":["kushan"],
+        "type":"hero",
         "cost":2,
+        "medals":2,
         "hand":2,
+        "play":1,
+        "source":"campaign"
+    },
+    {
+        "name":"medical-chief",
+        "classAssignment":["frigate", "station", "super-capital"],
+        "faction":["kushan"],
+        "type":"hero",
+        "cost":2,
+        "medals":1,
+        "hand":1,
         "play":1,
         "source":"campaign"
     },
     {
         "name":"strategist",
         "classAssignment":["super-capital"],
-        "faction":["kushan", "taiidan"],
+        "faction":["kushan"],
         "cost":5,
+        "medals":3,
         "hand":4,
         "play":2,
         "slots":[
@@ -235,8 +297,32 @@
     {
         "name":"hot-shot-pilot",
         "classAssignment":["fighter"],
-        "faction":["kushan","taiidan"],
+        "faction":["taiidan"],
+        "type":"hero",
         "cost":3,
+        "medals":2,
+        "hand":2,
+        "play":1,
+        "source":"campaign"
+    },
+    {
+        "name":"fighter-ace",
+        "classAssignment":["fighter"],
+        "faction":["kushan"],
+        "type":"hero",
+        "cost":3,
+        "medals":2,
+        "hand":2,
+        "play":1,
+        "source":"campaign"
+    },
+    {
+        "name":"veteran-commander",
+        "classAssignment":["corvette"],
+        "faction":["taiidan"],
+        "type":"hero",
+        "cost":2,
+        "medals":2,
         "hand":2,
         "play":1,
         "source":"campaign"
@@ -244,13 +330,49 @@
     {
         "name":"grizzled-veteran",
         "classAssignment":["frigate"],
-        "faction":["kushan", "taiidan"],
+        "faction":["kushan"],
+        "type":"hero",
         "cost":3,
+        "medals":1,
         "hand":2,
         "play":1,
         "slots":[
             {
                 "class":"frigate",
+                "purchase":"required"
+            }
+        ],
+        "source":"campaign"
+    },
+    {
+        "name":"master-of-arms",
+        "classAssignment":["frigate"],
+        "faction":["kushan"],
+        "type":"hero",
+        "cost":3,
+        "medals":3,
+        "hand":3,
+        "play":2,
+        "slots":[
+            {
+                "class":"frigate",
+                "purchase":"required"
+            }
+        ],
+        "source":"campaign"
+    },
+    {
+        "name":"station-overseer",
+        "classAssignment":["station"],
+        "faction":["kushan"],
+        "type":"hero",
+        "cost":2,
+        "medals":1,
+        "hand":3,
+        "play":2,
+        "slots":[
+            {
+                "class":"station",
                 "purchase":"required"
             }
         ],
@@ -266,10 +388,21 @@
         "source":"campaign"
     },
     {
+        "name":"seeker",
+        "classAssignment":["corvette"],
+        "faction":["kushan","taiidan"],
+        "cost":1,
+        "hand":1,
+        "play":1,
+        "source":"campaign"
+    },
+    {
         "name":"master-engineer",
         "classAssignment":["station","frigate"],
-        "faction":["kushan", "taiidan"],
+        "faction":["taiidan"],
+        "type":"hero",
         "cost":2,
+        "medals":2,
         "hand":2,
         "play":1,
         "staff":true,
@@ -280,6 +413,17 @@
         "classAssignment":["station","platform","planet"],
         "faction":["kushan", "taiidan"],
         "cost":2,
+        "hand":3,
+        "play":2,
+        "source":"campaign"
+    },
+    {
+        "name":"battery-coordinator",
+        "classAssignment":["planet"],
+        "faction":["taiidan"],
+        "type":"hero",
+        "cost":3,
+        "medals":1,
         "hand":3,
         "play":2,
         "source":"campaign"
@@ -300,6 +444,15 @@
         "cost":1,
         "hand":1,
         "play":1,
+        "source":"campaign"
+    },
+    {
+        "name":"intelligence-officer",
+        "classAssignment":["station","super-capital"],
+        "faction":["kushan"],
+        "cost":1,
+        "hand":2,
+        "play":0,
         "source":"campaign"
     }
 ]
