@@ -105,7 +105,7 @@
     {
         "name":"space-station",
         "class":"station",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":5,
         "slots": [
             {
@@ -128,7 +128,7 @@
     {
         "name":"military-outpost",
         "class":"planet",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":4,
         "slots": [
             {
@@ -147,7 +147,7 @@
     {
         "name":"weapons-platform",
         "class":"platform",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":3,
         "source":"base"
     },
@@ -249,7 +249,7 @@
     {
         "name":"gun-platform",
         "class":"platform",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":2,
         "source":"campaign"
     },
@@ -263,14 +263,14 @@
     {
         "name":"field-generator",
         "class":"station",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":2,
         "source":"campaign"
     },
     {
         "name":"prison-station",
         "class":"station",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":2,
         "source":"campaign",
         "slots": [
@@ -289,7 +289,7 @@
     {
         "name":"shipyard",
         "class":"station",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan","taiidan", "kadesh", "turanic-raiders"],
         "cost":2,
         "source":"campaign",
         "slots": [
