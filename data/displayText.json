@@ -101,5 +101,19 @@
     "precision-focus":"Precision Focus",
     "automated-repairs":"Automated Repairs",
     "marines":"Marines",
-    "tritium-injection":"Tritium Injection"
+    "tritium-injection":"Tritium Injection",
+    "kadesh":"Kadesh",
+    "fuel-pod":"Fuel Pod",
+    "multi-beam-frigate":"Multi-beam Frigate",
+    "advanced-swarmer":"Advanced Swarmer",
+    "swarmer":"Swarmer",
+    "turanic-raiders":"Turanic Raiders",
+    "lord-carrier":"\"Lord\" Carrier",
+    "dagger-ion-array-frigate":"\"Dagger\" Ion Array Frigate",
+    "thief-heavy-corvette":"\"Thief\" Heavy Corvette",
+    "brigand-missile-corvette":"\"Brigand\" Missile Corvette",
+    "bandit-interceptor":"\"Bandit\" Interceptor", 
+    "tactical-adjunct":"Tactical Adjunct",
+    "cut-throat":"Cut Throat",
+    "lord-commander":"Lord Commander"
 }
