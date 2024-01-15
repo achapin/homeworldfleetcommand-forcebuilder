@@ -1075,10 +1075,22 @@ function validSource(entry) {
 function setupOptions(){
 
     factionSelection = document.getElementById("factionSelector");
+
     factions.forEach(faction =>{
         var option = new Option(displayText[faction], faction);
-        factionSelection.add(option);
+        var alreadyExists = false;
+
+        for (var i=0; i<factionSelection.options.length; i++) {00
+            if (displayText[faction] == factionSelection.options[i].text) {
+                alreadyExists = true;
+            }
+        }
+
+        if (!alreadyExists) {
+            factionSelection.add(option);
+        }
     });
+
     factionSelection.onchange = function() {
         force.faction = factionSelection.value;
         updateForce();
