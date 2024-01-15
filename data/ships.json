@@ -126,7 +126,7 @@
         "source":"base"
     },
     {
-        "name":"military-output",
+        "name":"military-outpost",
         "class":"planet",
         "faction":["kushan","taiidan"],
         "cost":4,

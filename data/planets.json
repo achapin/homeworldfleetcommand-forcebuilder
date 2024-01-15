@@ -42,9 +42,30 @@
     },
     {
         "name":"new-settlement",
-        "cost":2,
+        "cost":1,
         "class":"planet",
         "slots":[
+            {
+                "class":"facility",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"fighter",
+                "purchase":"optional"
+            }
+        ]
+    },
+    {
+        "name":"civilised-world",
+        "cost":3,
+        "class":"planet",
+        "slots":[
+            {
+                "class":"facility",
+                "purchase":"required",
+                "count": 2
+            },
             {
                 "class":"facility",
                 "purchase":"optional",
