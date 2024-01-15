@@ -5,7 +5,8 @@ var upgrades = [];
 var planets = [];
 var facilities = [];
 var displayText = {};
-var factions = ["kushan","taiidan", "kadesh", "turanic-raiders"];
+var factions = ["kushan","taiidan"];
+var factionsScoutBox = ["kadesh", "turanic-raiders"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
 var metaClasses = {
     "super-capital" : "capital",
@@ -38,6 +39,7 @@ var unitDropdown, leaderDropdown;
 var requiredSlots, optionalSlots, freeSlots, unslottedUnits, freeUnits;
 var factionSelection;
 var contentCampaign;
+var contentScout;
 
 function getUrl(url){
 	var req = new XMLHttpRequest();
@@ -92,6 +94,7 @@ function loadForce(forceName) {
     force.faction = forceJson.faction;
     factionSelection.value = force.faction;
     contentCampaign.checked = forceJson.useCampaign;
+    contentScout.checked = forceJson.useScout;
     setupOptions();
     updateForce();
 }
@@ -1042,6 +1045,7 @@ function compareFacilities(dataA,dataB){
 
 function changeContentSettings(){
     force.useCampaign = contentCampaign.checked;
+    force.useScout = contentScout.checked;
     var leaderSection = document.getElementById("addLeaderSection")
     leaderSection.innerHTML = "";
     var unitSection = document.getElementById("addUnitSection")
@@ -1049,47 +1053,55 @@ function changeContentSettings(){
     var planetSection = document.getElementById("addPlanetSection")
     planetSection.innerHTML = "";
     setupOptions();
+    
     force.leaders.forEach(leader => {
         var leaderData = getLeaderData(leader.leaderId);
-        if(leaderData.source == "campaign"){
+        if(!validSource(leaderData)){
             removeLeader(leader);
         }
     });
     force.units.forEach(unit => {
         var unitData = getUnitData(unit.unitId);
-        if(unitData.source == "campaign"){
+        if(!validSource(unitData)){
             removeUnit(unit);
-        } else {
+        } 
+        if(!force.useCampaign){ //Only source of upgrades is from the campaign
             delete(unit.upgrades);
         }
     })
-    delete(force.planets);
+
+    if(!force.useCampaign) {
+        delete(force.planets);
+    }
     updateForce();
 }
 
 function validSource(entry) {
     return entry.source == "base"
-        || (contentCampaign.checked && entry.source == "campaign");
+        || (contentCampaign.checked && entry.source == "campaign")
+        || (contentScout.checked && entry.source == "kickstarter-scout-box");
 }
 
 function setupOptions(){
 
     factionSelection = document.getElementById("factionSelector");
 
+
+    while (factionSelection.options.length > 0) {                
+        factionSelection.options.remove(0);
+    }   
+
     factions.forEach(faction =>{
         var option = new Option(displayText[faction], faction);
-        var alreadyExists = false;
-
-        for (var i=0; i<factionSelection.options.length; i++) {00
-            if (displayText[faction] == factionSelection.options[i].text) {
-                alreadyExists = true;
-            }
-        }
-
-        if (!alreadyExists) {
-            factionSelection.add(option);
-        }
+        factionSelection.add(option);
     });
+
+    if(force.useScout){
+        factionsScoutBox.forEach(faction =>{
+            var option = new Option(displayText[faction], faction);
+            factionSelection.add(option);
+        });
+    }
 
     factionSelection.onchange = function() {
         force.faction = factionSelection.value;
@@ -1222,6 +1234,9 @@ function initialize()
 {
     contentCampaign = document.getElementById("content-campaign");
     contentCampaign.addEventListener("click", changeContentSettings);
+
+    contentScout = document.getElementById("content-scoutbox");
+    contentScout.addEventListener("click", changeContentSettings);
 
     var shipsLoadPromise = loadURL("data/ships.json");
 	shipsLoadPromise.then(shipsLoaded);
