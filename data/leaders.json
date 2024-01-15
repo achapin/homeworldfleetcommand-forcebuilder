@@ -10,7 +10,7 @@
     },
     {
         "name":"vice-admiral",
-        "classAssignment":["super-capital","station"],
+        "classAssignment":["super-capital"],
         "faction":["kushan","taiidan"],
         "cost":3,
         "hand":4,
@@ -21,7 +21,7 @@
                 "purchase":"required"
             },
             {
-                "class":"frigate",
+                "class":"super-capital",
                 "purchase":"optional"
             }
         ],
@@ -73,7 +73,7 @@
                 "purchase":"required"
             },
             {
-                "class":"frigate",
+                "class":"super-capital",
                 "purchase":"optional",
                 "count":2
             }
@@ -138,7 +138,7 @@
         "name":"marine-commander",
         "classAssignment":["corvette","frigate"],
         "faction":["kushan","taiidan"],
-        "cost":2,
+        "cost":1,
         "hand":1,
         "play":1,
         "slots":[
