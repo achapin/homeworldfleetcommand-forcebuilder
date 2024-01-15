@@ -455,5 +455,38 @@
         "hand":2,
         "play":0,
         "source":"campaign"
+    },
+    {
+        "name":"tactical-adjunct",
+        "classAssignment":["frigate"],
+        "faction":["kadesh"],
+        "cost":1,
+        "hand":1,
+        "play":1,
+        "source":"kickstarter-scout-box"
+    },
+    {
+        "name":"cut-throat",
+        "classAssignment":["corvette"],
+        "faction":["turanic-raiders"],
+        "cost":1,
+        "hand":1,
+        "play":1,
+        "source":"kickstarter-scout-box"
+    },
+    {
+        "name":"lord-commander",
+        "classAssignment":["super-capital"],
+        "faction":["turanic-raiders"],
+        "cost":4,
+        "hand":5,
+        "play":3,
+        "slots":[
+            {
+                "class":"super-capital",
+                "purchase":"required"
+            }
+        ],
+        "source":"kickstarter-scout-box"
     }
 ]

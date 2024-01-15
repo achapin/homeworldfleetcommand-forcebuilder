@@ -5,7 +5,7 @@ var upgrades = [];
 var planets = [];
 var facilities = [];
 var displayText = {};
-var factions = ["kushan","taiidan"];
+var factions = ["kushan","taiidan", "kadesh", "turanic-raiders"];
 var classOrder = ["super-capital","frigate","corvette","fighter","station","platform"]
 var metaClasses = {
     "super-capital" : "capital",
