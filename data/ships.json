@@ -43,6 +43,20 @@
         "source":"base"
     },
     {
+        "name":"repair-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign"
+    },
+    {
+        "name":"minelayer-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign"
+    },
+    {
         "name":"attack-bomber",
         "class":"fighter",
         "faction":["kushan", "taiidan"],
@@ -229,7 +243,7 @@
         "name":"cloaked-fighter",
         "class":"fighter",
         "faction":["kushan","taiidan"],
-        "cost":7,
+        "cost":4,
         "source":"campaign"
     },
     {
