@@ -425,6 +425,13 @@ function removeLeader(leader) {
     }
 }
 
+function removePlanet(planet){
+    const index = force.planets.indexOf(planet);
+    if(index > -1){
+        force.planets.splice(index, 1);
+    }
+}
+
 function renderUnit(unit, unitCount, unitSection){
     var unitContainer = document.createElement("div");
     unitContainer.classList.add("entry")
@@ -1070,9 +1077,12 @@ function changeContentSettings(){
         }
     })
 
-    if(!force.useCampaign) {
-        delete(force.planets);
-    }
+    force.planets.forEach(planet => {
+        var planetData = getLeaderData(planet.planetId);
+        if(!validSource(planetData)){
+            removePlanet(planet);
+        }
+    });
     updateForce();
 }
 
@@ -1151,19 +1161,16 @@ function setupOptions(){
     unitSection.appendChild(unitAddButton);
 
     var planetSection = document.getElementById("addPlanetSection");
-    if(!contentCampaign.checked){
-        planetSection.classList.add("noDisplay");
-    } else {
-        planetSection.classList.remove("noDisplay")
-    }
     var planetLabel = document.createElement("span");
     planetLabel.innerHTML = "Planets:";
     planetSection.appendChild(planetLabel);
 
     planetDropdown = document.createElement("SELECT");
     planets.forEach(function(planet){
-        var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
-        planetDropdown.add(option);
+        if(validSource(planet)){
+            var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
+            planetDropdown.add(option);
+        }
     });
     planetSection.appendChild(planetDropdown);
 

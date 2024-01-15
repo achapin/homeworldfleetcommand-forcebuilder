@@ -18,7 +18,8 @@
                 "class":"fighter",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"established-colony",
@@ -38,7 +39,8 @@
                 "class":"fighter",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"new-settlement",
@@ -54,7 +56,8 @@
                 "class":"fighter",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"campaign"
     },
     {
         "name":"civilised-world",
@@ -75,6 +78,25 @@
                 "class":"fighter",
                 "purchase":"optional"
             }
-        ]
+        ],
+        "source":"campaign"
+    },
+    {
+        "name":"military-outpost",
+        "class":"planet",
+        "cost":4,
+        "slots": [
+            {
+                "class":"fighter",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 2
+            }
+        ],
+        "source":"base"
     }
 ]
