@@ -43,6 +43,20 @@
         "source":"base"
     },
     {
+        "name":"repair-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign"
+    },
+    {
+        "name":"minelayer-corvette",
+        "class":"corvette",
+        "faction":["kushan","taiidan"],
+        "cost":2,
+        "source":"campaign"
+    },
+    {
         "name":"attack-bomber",
         "class":"fighter",
         "faction":["kushan", "taiidan"],
@@ -72,8 +86,11 @@
             },
             {
                 "class":"strike-craft",
-                "purchase":"optional",
-                "count": 2
+                "purchase":"required"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional"
             }
         ],
         "source":"base"
@@ -90,6 +107,41 @@
         "class":"station",
         "faction":["kushan","taiidan"],
         "cost":5,
+        "slots": [
+            {
+                "class":"fighter",
+                "purchase":"required"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"platform",
+                "purchase":"optional",
+                "count": 2
+            }
+        ],
+        "source":"base"
+    },
+    {
+        "name":"military-outpost",
+        "class":"planet",
+        "faction":["kushan","taiidan"],
+        "cost":4,
+        "slots": [
+            {
+                "class":"fighter",
+                "purchase":"optional",
+                "count": 2
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 2
+            }
+        ],
         "source":"base"
     },
     {
@@ -123,8 +175,15 @@
     {
         "name":"defender",
         "class":"fighter",
-        "faction":["kushan","taiidan"],
+        "faction":["kushan"],
         "cost":2,
+        "source":"base"
+    },
+    {
+        "name":"defence-fighter",
+        "class":"fighter",
+        "faction":["taiidan"],
+        "cost":3,
         "source":"base"
     },
     {
@@ -155,10 +214,36 @@
         "source":"base"
     },
     {
+        "name":"imperial-flagship",
+        "class":"super-capital",
+        "faction":["taiidan"],
+        "cost":7,
+        "slots": [
+            {
+                "class":"fighter",
+                "purchase":"free"
+            },
+            {
+                "class":"fighter",
+                "purchase":"optional"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"required"
+            },
+            {
+                "class":"strike-craft",
+                "purchase":"optional",
+                "count": 3
+            }
+        ],
+        "source":"base"
+    },
+    {
         "name":"cloaked-fighter",
         "class":"fighter",
         "faction":["kushan","taiidan"],
-        "cost":7,
+        "cost":4,
         "source":"campaign"
     },
     {
