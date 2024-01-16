@@ -616,6 +616,23 @@ function renderUnit(unit, unitCount, unitSection){
         unitContainer.appendChild(unitUpgradeDiv);
     }
 
+    var reservesLabel = document.createElement("label");
+    reservesLabel.innerHTML = "Unit In Reserve:";
+    unitContainer.appendChild(reservesLabel);
+
+    var reservesCheckbox = document.createElement("input");
+    reservesCheckbox.setAttribute("type", "checkbox");
+    reservesCheckbox.checked = unit.hasOwnProperty("reserve");
+    reservesCheckbox.addEventListener("click", () => {
+        if(unit.hasOwnProperty("reserve")){
+            delete(unit.reserve);
+        } else{
+            unit.reserve = "true";
+        }
+        updateForce();
+    });
+    unitContainer.appendChild(reservesCheckbox);
+
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
         slotWarningdiv.innerHTML = "⚠ There is no Unit Tab available for this unit."
@@ -955,11 +972,20 @@ function calculateForceCost(){
     var totalPlay = 1;
 
     var totalCost = 0;
+    var mainCost = 0;
+    var reserveCost = 0;
     force.leaders.forEach(function(leader) { 
         var leaderData = getLeaderData(leader.leaderId);
         totalCost += leaderData.cost;
         totalHand += leaderData.hand;
         totalPlay += leaderData.play;
+        if(leader.assignedUnit != null){
+            if(leader.assignedUnit.hasOwnProperty("reserve")){
+                reserveCost += leaderData.cost;
+            } else{
+                mainCost += leaderData.cost;
+            }
+        }
      });
     
     force.units.forEach(function(unit) { 
@@ -976,10 +1002,22 @@ function calculateForceCost(){
             }
         }
 
+        if(unit.hasOwnProperty("reserve")){
+            reserveCost += unitData.cost;
+        } else {
+            mainCost += unitData.cost;
+        }
+
         if(unit.hasOwnProperty("upgrades")){
             unit.upgrades.forEach(upgrade =>{
                 var upgradeData = getUpgradeData(upgrade);
                 totalCost += upgradeData.cost;
+
+                if(unit.hasOwnProperty("reserve")){
+                    reserveCost += upgradeData.cost;
+                } else {
+                    mainCost += upgradeData.cost;
+                }
             })
         }
      });
@@ -988,10 +1026,12 @@ function calculateForceCost(){
         force.planets.forEach(planet => {
             var planetData = getPlanetData(planet.planetId);
             totalCost += planetData.cost;
+            mainCost += planetData.cost; //Assuming here that planets won't be able to come in from reserve...
             if(planet.hasOwnProperty("facilities")){
                 planet.facilities.forEach(facility => {
                     var facilityData = getFacilityData(facility);
                     totalCost += facilityData.cost;
+                    mainCost += facilityData.cost;
                 });
             }
         });
@@ -1000,6 +1040,8 @@ function calculateForceCost(){
      document.getElementById("forceCost").innerHTML = totalCost + "★";
      document.getElementById("totalHand").innerHTML = totalHand;
      document.getElementById("totalPlay").innerHTML = totalPlay;
+     document.getElementById("mainForceCost").innerHTML = mainCost + "★";
+     document.getElementById("reservesCost").innerHTML = reserveCost + "★";
 }
 
 function getLeaderData(leaderId){
