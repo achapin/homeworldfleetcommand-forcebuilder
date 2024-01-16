@@ -719,101 +719,103 @@ function renderPlanet(planet, section) {
     planetClassValue.innerHTML = "Planet";
     planetContainer.appendChild(planetClassValue);
 
-    var commanderSection = document.createElement("div");
-    commanderSection.classList.add("commanderSection");
+    if(force.useCampaign) {
+        var commanderSection = document.createElement("div");
+        commanderSection.classList.add("commanderSection");
 
-    var planetCommanderLabel = document.createElement("span");
-    planetCommanderLabel.innerHTML = "Commander:";
-    commanderSection.appendChild(planetCommanderLabel);
+        var planetCommanderLabel = document.createElement("span");
+        planetCommanderLabel.innerHTML = "Commander:";
+        commanderSection.appendChild(planetCommanderLabel);
 
-    var leaderOptions = document.createElement("SELECT");
-    leaderOptions.add(new Option("No Commander", null));
-    force.leaders.forEach(function(leader){
-        var leaderData = getLeaderData(leader.leaderId);
-        if((leader.assignedUnit == null  || planet.commander == leader.uniqueCode)
-            && canLeaderBeOn(leaderData, planetData) && !leaderData.hasOwnProperty("staff")){
-            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
-            leaderOptions.add(option);
+        var leaderOptions = document.createElement("SELECT");
+        leaderOptions.add(new Option("No Commander", null));
+        force.leaders.forEach(function(leader){
+            var leaderData = getLeaderData(leader.leaderId);
+            if((leader.assignedUnit == null  || planet.commander == leader.uniqueCode)
+                && canLeaderBeOn(leaderData, planetData) && !leaderData.hasOwnProperty("staff")){
+                var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+                leaderOptions.add(option);
+            }
+        });
+        if(planet.commander != null){
+            leaderOptions.value = planet.commander;
         }
-    });
-    if(planet.commander != null){
-        leaderOptions.value = planet.commander;
-    }
-    leaderOptions.onchange = function(){
+        leaderOptions.onchange = function(){
+
+            if(planet.commander != null){
+                var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
+                currentLeader.assignedUnit = null;
+            }
+
+            if(leaderOptions.selectedIndex == 0){
+                planet.commander = null;
+            } else {
+                var assignedLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(leaderOptions.value) == 0);
+                planet.commander = assignedLeader.uniqueCode;
+                assignedLeader.assignedUnit = planet;
+            }
+            updateForce();
+        }
+        commanderSection.appendChild(leaderOptions);
 
         if(planet.commander != null){
-            var currentLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0);
-            currentLeader.assignedUnit = null;
+            var planetCommanderDiv = document.createElement("div");
+            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0), planetCommanderDiv);
+            commanderSection.appendChild(planetCommanderDiv);
         }
 
-        if(leaderOptions.selectedIndex == 0){
-            planet.commander = null;
-        } else {
-            var assignedLeader = force.leaders.find(leader => leader.uniqueCode.localeCompare(leaderOptions.value) == 0);
-            planet.commander = assignedLeader.uniqueCode;
-            assignedLeader.assignedUnit = planet;
-        }
-        updateForce();
-    }
-    commanderSection.appendChild(leaderOptions);
+        planetContainer.appendChild(commanderSection);
 
-    if(planet.commander != null){
-        var planetCommanderDiv = document.createElement("div");
-        renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(planet.commander) == 0), planetCommanderDiv);
-        commanderSection.appendChild(planetCommanderDiv);
-    }
+        var planetStaffLabel = document.createElement("span");
+        planetStaffLabel.innerHTML = "Staff:";
+        commanderSection.appendChild(planetStaffLabel);
 
-    planetContainer.appendChild(commanderSection);
-
-    var planetStaffLabel = document.createElement("span");
-    planetStaffLabel.innerHTML = "Staff:";
-    commanderSection.appendChild(planetStaffLabel);
-
-    var staffOptions = document.createElement("SELECT");
-    var addStaffButton = document.createElement("button");
-    staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
-    addStaffButton.disabled = "disabled";
-    force.leaders.forEach(function(leader){
-        addStaffButton.disabled = "enabled";
-        var leaderData = getLeaderData(leader.leaderId);
-        if((leader.assignedUnit == null)
-            && canLeaderBeOn(leaderData, planetData) 
-            && leaderData.hasOwnProperty("staff")){
-            var option = new Option(displayText[leaderData.name], leader.uniqueCode);
-            staffOptions.add(option);
-        }
-    });
-    staffOptions.onchange = function() {
-        if(staffOptions.selectedIndex == 0){
-            addStaffButton.disabled = true;
-        } else {
-            addStaffButton.disabled = false;
-        }
-    }
-    commanderSection.appendChild(staffOptions);
-    
-    addStaffButton.innerHTML = "Add Staff";
-    addStaffButton.onclick = function(){
-        var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
-        if(!planet.hasOwnProperty("staff")){
-            planet.staff = [];
-        }
-        planet.staff.push(newStaff.uniqueCode);
-        newStaff.assignedUnit = planet;
-        updateForce();
-    }
-    commanderSection.appendChild(addStaffButton);
-
-    if(planet.hasOwnProperty("staff")){
-        planet.staff.forEach(staffId =>{
-            var planetStaffDiv = document.createElement("div");
-            renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), planetStaffDiv);
-            commanderSection.appendChild(planetStaffDiv);
+        var staffOptions = document.createElement("SELECT");
+        var addStaffButton = document.createElement("button");
+        staffOptions.add(new Option("- Select a Staff Hero to Add-", null));
+        addStaffButton.disabled = "disabled";
+        force.leaders.forEach(function(leader){
+            addStaffButton.disabled = "enabled";
+            var leaderData = getLeaderData(leader.leaderId);
+            if((leader.assignedUnit == null)
+                && canLeaderBeOn(leaderData, planetData) 
+                && leaderData.hasOwnProperty("staff")){
+                var option = new Option(displayText[leaderData.name], leader.uniqueCode);
+                staffOptions.add(option);
+            }
         });
-        if(planet.staff.length > 0 && planet.commander == null){
-            var staffWarningdiv = document.createElement("span");
-            staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
-            planetWarningDiv.appendChild(staffWarningdiv);
+        staffOptions.onchange = function() {
+            if(staffOptions.selectedIndex == 0){
+                addStaffButton.disabled = true;
+            } else {
+                addStaffButton.disabled = false;
+            }
+        }
+        commanderSection.appendChild(staffOptions);
+        
+        addStaffButton.innerHTML = "Add Staff";
+        addStaffButton.onclick = function(){
+            var newStaff = force.leaders.find(leader => leader.uniqueCode.localeCompare(staffOptions.value) == 0);
+            if(!planet.hasOwnProperty("staff")){
+                planet.staff = [];
+            }
+            planet.staff.push(newStaff.uniqueCode);
+            newStaff.assignedUnit = planet;
+            updateForce();
+        }
+        commanderSection.appendChild(addStaffButton);
+
+        if(planet.hasOwnProperty("staff")){
+            planet.staff.forEach(staffId =>{
+                var planetStaffDiv = document.createElement("div");
+                renderLeader(force.leaders.find(leader => leader.uniqueCode.localeCompare(staffId) == 0), planetStaffDiv);
+                commanderSection.appendChild(planetStaffDiv);
+            });
+            if(planet.staff.length > 0 && planet.commander == null){
+                var staffWarningdiv = document.createElement("span");
+                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+                planetWarningDiv.appendChild(staffWarningdiv);
+            }
         }
     }
 
@@ -862,19 +864,21 @@ function renderPlanet(planet, section) {
     facilityOptions.add(new Option("- Select a Facility to add -", null));
     if(planetFreeSlots.length > 0 || planetRequiredSlots.length > 0 || planetOptionalSlots.length > 0){
         facilities.forEach(facility => {
-            if(!planet.hasOwnProperty("facilities")) {
-                var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
-                facilityOptions.add(option);
-            } else {
-                var currentCount = 0;
-                planet.facilities.forEach(localFacility => {
-                    if(localFacility.localeCompare(facility.name) == 0) {
-                        currentCount++;
-                    }
-                });
-                if(currentCount < facility.max) {
+            if(validSource(facility)){
+                if(!planet.hasOwnProperty("facilities")) {
                     var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
                     facilityOptions.add(option);
+                } else {
+                    var currentCount = 0;
+                    planet.facilities.forEach(localFacility => {
+                        if(localFacility.localeCompare(facility.name) == 0) {
+                            currentCount++;
+                        }
+                    });
+                    if(currentCount < facility.max) {
+                        var option = new Option(displayText[facility.name] + " (" + facility.cost + ")", facility.name);
+                        facilityOptions.add(option);
+                    }
                 }
             }
         });
@@ -1078,9 +1082,16 @@ function changeContentSettings(){
     })
 
     force.planets.forEach(planet => {
-        var planetData = getLeaderData(planet.planetId);
+        var planetData = getPlanetData(planet.planetId);
         if(!validSource(planetData)){
             removePlanet(planet);
+        } else{
+            planet.facilities.forEach(facility => {
+                var facilityData = getFacilityData(facility);
+                if(!validSource(facilityData)){
+                    planet.facilities.splice(planet.facilities.indexOf(facility),1);
+                }
+            });
         }
     });
     updateForce();
