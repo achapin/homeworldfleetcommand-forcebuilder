@@ -624,7 +624,7 @@ function renderUnit(unit, unitCount, unitSection){
 
     if(unitData.faction.indexOf(force.faction) < 0){
         var factionWarningdiv = document.createElement("span");
-        factionWarningdiv.innerHTML = "⚠ This Unit is not available for the " + force.faction + " faction";
+        factionWarningdiv.innerHTML = "⚠ This Unit is not available for the " + displayText[force.faction] + " faction";
         unitWarningDiv.appendChild(factionWarningdiv);
     }
 
