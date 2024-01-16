@@ -950,7 +950,7 @@ function renderFacility(facility,facilitySection, planet) {
 
 function calculateForceCost(){
 
-    //Both Kushan and Taiidan both have 2-hand 1-play as a base
+    // All factions (Kushan, Taiidan, Kadesh, Turanic Raiders) have 2-hand 1-play as a base
     var totalHand = 2;
     var totalPlay = 1;
 
@@ -961,11 +961,21 @@ function calculateForceCost(){
         totalHand += leaderData.hand;
         totalPlay += leaderData.play;
      });
+    
     force.units.forEach(function(unit) { 
         if(freeUnits.indexOf(unit) < 0){
             var unitData = getUnitData(unit.unitId);
             totalCost += unitData.cost;
+
+            // Kadesh Mothership and Fuel Pod have Hand & Play values
+            if(unitData.hasOwnProperty("hand")){
+                totalHand += unitData.hand;
+            }
+            if(unitData.hasOwnProperty("play")){
+                totalPlay += unitData.play;
+            }
         }
+
         if(unit.hasOwnProperty("upgrades")){
             unit.upgrades.forEach(upgrade =>{
                 var upgradeData = getUpgradeData(upgrade);
