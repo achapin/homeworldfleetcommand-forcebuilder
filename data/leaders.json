@@ -82,7 +82,7 @@
     },
     {
         "name":"carrier-captain",
-        "classAssignment":["carrier","mothership"],
+        "classAssignment":["carrier","mothership-kushan","mothership-kadesh"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "hand":1,
