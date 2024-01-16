@@ -472,11 +472,11 @@ function renderUnit(unit, unitCount, unitSection){
     commanderSection.classList.add("commanderSection");
 
     var unitCommanderLabel = document.createElement("span");
-    unitCommanderLabel.innerHTML = "Commander:";
+    unitCommanderLabel.innerHTML = "Leader:";
     commanderSection.appendChild(unitCommanderLabel);
 
     var leaderOptions = document.createElement("SELECT");
-    leaderOptions.add(new Option("No Commander", null));
+    leaderOptions.add(new Option("No Leader", null));
     force.leaders.forEach(function(leader){
         var leaderData = getLeaderData(leader.leaderId);
         if((leader.assignedUnit == null  || unit.commander == leader.uniqueCode)
@@ -618,7 +618,7 @@ function renderUnit(unit, unitCount, unitSection){
 
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
-        slotWarningdiv.innerHTML = "⚠ This Unit is not in any available slot"
+        slotWarningdiv.innerHTML = "⚠ There is no Unit Tab available for this unit."
         unitWarningDiv.appendChild(slotWarningdiv);
     }
 
