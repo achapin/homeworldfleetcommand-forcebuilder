@@ -1,6 +1,6 @@
 [
     {
-        "name":"mothership",
+        "name":"mothership-kushan",
         "class":"super-capital",
         "faction":["kushan"],
         "cost":7,
@@ -281,7 +281,7 @@
         ]
     },
     {
-        "name":"mothership",
+        "name":"mothership-kadesh",
         "class":"super-capital",
         "faction":["kadesh"],
         "cost":7,
