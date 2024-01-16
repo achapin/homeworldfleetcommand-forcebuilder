@@ -1151,19 +1151,19 @@ function setupOptions(){
     unitSection.appendChild(unitAddButton);
 
     var planetSection = document.getElementById("addPlanetSection");
-    if(!contentCampaign.checked){
-        planetSection.classList.add("noDisplay");
-    } else {
-        planetSection.classList.remove("noDisplay")
-    }
+
     var planetLabel = document.createElement("span");
     planetLabel.innerHTML = "Planets:";
     planetSection.appendChild(planetLabel);
 
     planetDropdown = document.createElement("SELECT");
     planets.forEach(function(planet){
-        var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
-        planetDropdown.add(option);
+
+         // Military Outpost is the only base game planet, so we only show that if no additional content is activated
+        if(validSource(planet)){
+            var option = new Option(displayText[planet.name] + " (" + planet.cost + ")", planet.name);
+            planetDropdown.add(option);
+        }
     });
     planetSection.appendChild(planetDropdown);
 
