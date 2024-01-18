@@ -234,6 +234,7 @@ function processSlots() {
 
     force.units.forEach(function(unit) { 
         var unitData = getUnitData(unit.unitId);
+        var metaClass = metaClasses[unitData.class];
         if(freeSlots.indexOf(unitData.name) >= 0){
             freeSlots.splice(freeSlots.indexOf(unitData.name), 1);
             freeUnits.push(unit);
@@ -244,12 +245,20 @@ function processSlots() {
             freeUnits.push(unit);
             return;
         }
+        if(freeSlots.indexOf(metaClass) >= 0){
+            freeSlots.splice(freeSlots.indexOf(metaClass), 1);
+            return;
+        }
         if(requiredSlots.indexOf(unitData.name) >= 0){
             requiredSlots.splice(requiredSlots.indexOf(unitData.name), 1);
             return;
         }
         if(requiredSlots.indexOf(unitData.class) >= 0){
             requiredSlots.splice(requiredSlots.indexOf(unitData.class), 1);
+            return;
+        }
+        if(requiredSlots.indexOf(metaClass) >= 0){
+            requiredSlots.splice(requiredSlots.indexOf(metaClass), 1);
             return;
         }
         if(optionalSlots.indexOf(unitData.name) >= 0){
@@ -260,7 +269,6 @@ function processSlots() {
             optionalSlots.splice(optionalSlots.indexOf(unitData.class), 1);
             return;
         }
-        var metaClass = metaClasses[unitData.class];
         if(optionalSlots.indexOf(metaClass) >= 0){
             optionalSlots.splice(optionalSlots.indexOf(metaClass), 1);
             return;
@@ -1000,12 +1008,12 @@ function calculateForceCost(){
             if(unitData.hasOwnProperty("play")){
                 totalPlay += unitData.play;
             }
-        }
 
-        if(unit.hasOwnProperty("reserve")){
-            reserveCost += unitData.cost;
-        } else {
-            mainCost += unitData.cost;
+            if(unit.hasOwnProperty("reserve")){
+                reserveCost += unitData.cost;
+            } else {
+                mainCost += unitData.cost;
+            }
         }
 
         if(unit.hasOwnProperty("upgrades")){
