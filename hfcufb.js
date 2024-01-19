@@ -1176,12 +1176,6 @@ function compareFacilities(dataA,dataB){
 function changeContentSettings(){
     force.useCampaign = contentCampaign.checked;
     force.useScout = contentScout.checked;
-    var leaderSection = document.getElementById("addLeaderSection")
-    leaderSection.innerHTML = "";
-    var unitSection = document.getElementById("addUnitSection")
-    unitSection.innerHTML = "";
-    var planetSection = document.getElementById("addPlanetSection")
-    planetSection.innerHTML = "";
     setupOptions();
     
     force.leaders.forEach(leader => {
@@ -1222,11 +1216,22 @@ function validSource(entry) {
         || (contentScout.checked && entry.source == "kickstarter-scout-box");
 }
 
+function changeFaction(newFaction){
+    force.faction = newFaction;
+    updateForce();
+    setupOptions();
+}
+
 function setupOptions(){
 
+    var leaderSection = document.getElementById("addLeaderSection")
+    leaderSection.innerHTML = "";
+    var unitSection = document.getElementById("addUnitSection")
+    unitSection.innerHTML = "";
+    var planetSection = document.getElementById("addPlanetSection")
+    planetSection.innerHTML = "";
+
     factionSelection = document.getElementById("factionSelector");
-
-
     while (factionSelection.options.length > 0) {                
         factionSelection.options.remove(0);
     }   
@@ -1244,8 +1249,7 @@ function setupOptions(){
     }
 
     factionSelection.onchange = function() {
-        force.faction = factionSelection.value;
-        updateForce();
+        changeFaction(factionSelection.value);
     }
 
     var leaderSection = document.getElementById("addLeaderSection")
@@ -1255,7 +1259,7 @@ function setupOptions(){
 
     leaderDropdown = document.createElement("SELECT");
     leaders.forEach(function(leader){
-        if(validSource(leader)) {
+        if(validSource(leader) && leader.faction.indexOf(force.faction) >= 0) {
             var option = new Option(displayText[leader.name] + " (" + leader.cost + ")", leader.name);
             leaderDropdown.add(option);
         }
