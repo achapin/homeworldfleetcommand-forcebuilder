@@ -594,6 +594,7 @@ function renderUnit(unit, unitCount, unitSection){
         upgrades.forEach(upgrade => {
             if((!unit.hasOwnProperty("upgrades")
             || unit.upgrades.indexOf(upgrade.name) < 0)
+            && upgrade.faction.indexOf(force.faction) >= 0
             && (upgrade.classAssignment.indexOf(unitData.name) >= 0
             || upgrade.classAssignment.indexOf(unitData.class) >= 0
             || upgrade.classAssignment.indexOf(metaClasses[unitData.class]) >= 0)) {
@@ -624,7 +625,7 @@ function renderUnit(unit, unitCount, unitSection){
         if(unit.hasOwnProperty("upgrades")){
             unit.upgrades.sort(compareUpgrade);
             unit.upgrades.forEach(upgrade => {
-                renderUpgrade(upgrade,unitUpgradeDiv, unit);
+                renderUpgrade(upgrade,unitUpgradeDiv, unit, unitWarningDiv);
             })
         }
 
@@ -677,7 +678,7 @@ function removeUnit(unit) {
     }
 }
 
-function renderUpgrade(upgrade, upgradeSection, unit){
+function renderUpgrade(upgrade, upgradeSection, unit, warningDiv){
     var container = document.createElement("div");
     container.classList.add("entry");
     var upgradeData = getUpgradeData(upgrade);
@@ -710,6 +711,12 @@ function renderUpgrade(upgrade, upgradeSection, unit){
     }
 
     upgradeSection.appendChild(container);
+
+    if(upgradeData.faction.indexOf(force.faction) < 0){
+        var factionWarningdiv = document.createElement("span");
+        factionWarningdiv.innerHTML = "⚠ Upgrade " + displayText[upgradeData.name] + " is not allowed in the " + displayText[force.faction] + " faction";
+        warningDiv.appendChild(factionWarningdiv);
+    }
 }
 
 function renderPlanet(planet, section) {
