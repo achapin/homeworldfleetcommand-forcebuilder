@@ -171,6 +171,7 @@ function addPlanet(newPlanetId) {
 }
 
 function updateForce(){
+    force.invalidations = [];
     processSlots();
     renderEntries();
     calculateForceCost();
@@ -280,11 +281,19 @@ function processSlots() {
 function renderEntries(){
     var leaderSection = document.getElementById("unassignedLeaders");
     leaderSection.innerHTML = "";
+    var leaderWarning = false;
     force.leaders.forEach(function(leader) { 
         if(leader.assignedUnit == null){
             renderLeader(leader, leaderSection) 
+            leaderWarning = true;
         }
     });
+    if(leaderWarning){
+        var leaderWarningdiv = document.createElement("span");
+        leaderWarningdiv.innerHTML = "⚠ A Force is not valid if it has Unassigned leaders. All Leaders must be assigned to Units in order to be valid"
+        force.invalidations.push("There are unassigned leaders");
+        leaderSection.appendChild(leaderWarningdiv);
+    }
 
     var unitSection = document.getElementById("units");
     unitSection.innerHTML = "";
@@ -340,6 +349,7 @@ function renderEmptySlots(free, required, optional, emptySlotSection) {
         emptyRequiredSlotSection.classList.add("emptySlot");
         emptyRequiredSlotSection.classList.add("emptyRequiredSlot");
         emptyRequiredSlotSection.innerHTML = "⚠ REQUIRED: " + displayText[requiredSlot];
+        force.invalidations.push("There is a required Unit Tab for " + displayText[requiredSlot] + " which has not been filled");
         emptySlotSection.appendChild(emptyRequiredSlotSection);
     });
     optional.forEach(optionalSlot => {
@@ -579,6 +589,7 @@ function renderUnit(unit, unitCount, unitSection){
             if(unit.staff.length > 0 && unit.commander == null){
                 var staffWarningdiv = document.createElement("span");
                 staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Leader is also assigned.";
+                force.invalidations.push("There is staff assigned to a unit which has no leader");
                 unitWarningDiv.appendChild(staffWarningdiv);
             }
         }
@@ -652,12 +663,14 @@ function renderUnit(unit, unitCount, unitSection){
     if(unslottedUnits.indexOf(unit) >= 0){
         var slotWarningdiv = document.createElement("span");
         slotWarningdiv.innerHTML = "⚠ There is no Unit Tab available for this unit."
+        force.invalidations.push("There are Units in the force which have no valid Unit Tab to be placed within.");
         unitWarningDiv.appendChild(slotWarningdiv);
     }
 
     if(unitData.faction.indexOf(force.faction) < 0){
         var factionWarningdiv = document.createElement("span");
         factionWarningdiv.innerHTML = "⚠ This Unit is not available for the " + displayText[force.faction] + " faction";
+        force.invalidations.push("Units are included in the force which are not allowed in the " + displayText[force.faction] + " faction");
         unitWarningDiv.appendChild(factionWarningdiv);
     }
 
@@ -715,6 +728,7 @@ function renderUpgrade(upgrade, upgradeSection, unit, warningDiv){
     if(upgradeData.faction.indexOf(force.faction) < 0){
         var factionWarningdiv = document.createElement("span");
         factionWarningdiv.innerHTML = "⚠ Upgrade " + displayText[upgradeData.name] + " is not allowed in the " + displayText[force.faction] + " faction";
+        force.invalidations.push("There are Upgrades in the force which are not in the " + displayText[force.faction] + " faction");
         warningDiv.appendChild(factionWarningdiv);
     }
 }
@@ -858,7 +872,8 @@ function renderPlanet(planet, section) {
             });
             if(planet.staff.length > 0 && planet.commander == null){
                 var staffWarningdiv = document.createElement("span");
-                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Leader is also assigned.";
+                force.invalidations.push("Staff cannot be assigned to a Planet unless a Leader is also assigned");
                 planetWarningDiv.appendChild(staffWarningdiv);
             }
         }
@@ -1085,6 +1100,15 @@ function calculateForceCost(){
      document.getElementById("totalPlay").innerHTML = totalPlay;
      document.getElementById("mainForceCost").innerHTML = mainCost + "★";
      document.getElementById("reservesCost").innerHTML = reserveCost + "★";
+     if(force.invalidations.length <= 0){
+        document.getElementById("validState").innerHTML = "This force is valid";
+     } else {
+        var invalidationText = "THIS FORCE IS INVALID. ISSUES:";
+        force.invalidations.forEach(invalidation => {
+            invalidationText += "<br />" + invalidation;
+        });
+        document.getElementById("validState").innerHTML = invalidationText;
+     }
 }
 
 function getLeaderData(leaderId){
@@ -1293,6 +1317,7 @@ function setupForce(){
     force.leaders = [];
     force.units = [];
     force.planets = [];
+    force.invalidations = [];
 }
 
 function shipsLoaded(json){
