@@ -397,6 +397,12 @@ function renderLeader(leader, leaderSection){
     leaderCostValue.innerHTML = leaderData.cost + "★";
     leaderContainer.appendChild(leaderCostValue);
 
+    if(leaderData.hasOwnProperty("medals")){
+        var medalValue = document.createElement("span");
+        medalValue.innerHTML = leaderData.medals + "🥇";
+        leaderContainer.appendChild(medalValue);
+    }
+
     var leaderHandLabel = document.createElement("label");
     leaderHandLabel.innerHTML = "Hand";
     leaderContainer.appendChild(leaderHandLabel);
@@ -572,7 +578,7 @@ function renderUnit(unit, unitCount, unitSection){
             });
             if(unit.staff.length > 0 && unit.commander == null){
                 var staffWarningdiv = document.createElement("span");
-                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Commander is also assigned.";
+                staffWarningdiv.innerHTML = "⚠ Staff cannot be assigned unless a Leader is also assigned.";
                 unitWarningDiv.appendChild(staffWarningdiv);
             }
         }
@@ -696,6 +702,12 @@ function renderUpgrade(upgrade, upgradeSection, unit){
     var costValue = document.createElement("span");
     costValue.innerHTML = upgradeData.cost + "★";
     container.appendChild(costValue);
+
+    if(upgradeData.hasOwnProperty("medals")){
+        var medalValue = document.createElement("span");
+        medalValue.innerHTML = upgradeData.medals + "🥇";
+        container.appendChild(medalValue);
+    }
 
     upgradeSection.appendChild(container);
 }
@@ -983,6 +995,7 @@ function calculateForceCost(){
     var totalCost = 0;
     var mainCost = 0;
     var reserveCost = 0;
+    var totalMedals = 0;
     force.leaders.forEach(function(leader) { 
         var leaderData = getLeaderData(leader.leaderId);
         totalCost += leaderData.cost;
@@ -994,6 +1007,9 @@ function calculateForceCost(){
             } else{
                 mainCost += leaderData.cost;
             }
+        }
+        if(leaderData.hasOwnProperty("medals")){
+            totalMedals += leaderData.medals;
         }
      });
     
@@ -1027,6 +1043,10 @@ function calculateForceCost(){
                 } else {
                     mainCost += upgradeData.cost;
                 }
+
+                if(upgradeData.hasOwnProperty("medals")){
+                    totalMedals += upgradeData.medals;
+                }
             })
         }
      });
@@ -1047,6 +1067,13 @@ function calculateForceCost(){
      }
      
      document.getElementById("forceCost").innerHTML = totalCost + "★";
+     if(force.useCampaign){
+        document.getElementById("medalCost").innerHTML = totalMedals + "🥇";
+        document.getElementById("medalCost").classList.remove("hidden");
+     } else{
+        document.getElementById("medalCost").innerHTML = "";
+        document.getElementById("medalCost").classList.add("hidden");
+     }
      document.getElementById("totalHand").innerHTML = totalHand;
      document.getElementById("totalPlay").innerHTML = totalPlay;
      document.getElementById("mainForceCost").innerHTML = mainCost + "★";
