@@ -290,6 +290,10 @@
         "source":"kickstarter-scout-box",
         "slots": [
             {
+                "class":"super-capital",
+                "purchase":"required"
+            },
+            {
                 "class":"frigate",
                 "purchase":"optional",
                 "count":4

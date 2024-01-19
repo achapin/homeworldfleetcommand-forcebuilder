@@ -449,7 +449,7 @@
     },
     {
         "name":"intelligence-officer",
-        "classAssignment":["station","super-capital"],
+        "classAssignment":["station","capital"],
         "faction":["kushan"],
         "cost":1,
         "hand":2,
