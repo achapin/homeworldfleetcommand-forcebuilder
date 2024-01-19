@@ -588,8 +588,9 @@ function renderUnit(unit, unitCount, unitSection){
         upgrades.forEach(upgrade => {
             if((!unit.hasOwnProperty("upgrades")
             || unit.upgrades.indexOf(upgrade.name) < 0)
-            && (upgrade.restriction.localeCompare(unitData.name) == 0
-            || upgrade.restriction.localeCompare(unitData.class) == 0)) {
+            && (upgrade.classAssignment.indexOf(unitData.name) >= 0
+            || upgrade.classAssignment.indexOf(unitData.class) >= 0
+            || upgrade.classAssignment.indexOf(metaClasses[unitData.class]) >= 0)) {
                 var option = new Option(displayText[upgrade.name] + " (" + upgrade.cost + ")", upgrade.name);
                 upgradeOptions.add(option);
             }

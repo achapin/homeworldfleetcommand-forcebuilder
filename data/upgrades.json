@@ -4,57 +4,56 @@
         "faction":["taiidan"],
         "cost":1,
         "medals":1,
-        "restriction":"interceptor"
+        "classAssignment":["interceptor"]
     },
     {
         "name":"thicker-armor",
         "faction":["kushan"],
         "cost":1,
         "medals":1,
-        "restriction":"attack-bomber"
+        "classAssignment":["attack-bomber"]
     },
     {
         "name":"emp-bombs",
         "faction":["kushan"],
         "cost":0,
         "medals":1,
-        "restriction":"attack-bomber"
+        "classAssignment":["attack-bomber"]
     },
     {
         "name":"guided-rounds",
         "faction":["kushan"],
         "cost":1,
         "medals":1,
-        "restriction":"multigun-corvette"
+        "classAssignment":["multigun-corvette"]
     },
     {
         "name":"modified-barrels",
         "faction":["taiidan"],
         "cost":1,
         "medals":1,
-        "restriction":"heavy-corvette"
+        "classAssignment":["heavy-corvette"]
     },
     {
         "name":"raiders",
         "faction":["kushan"],
         "cost":1,
         "medals":1,
-        "restriction":"light-corvette"
+        "classAssignment":["light-corvette"]
     },
     {
         "name":"extra-thrusters",
         "faction":["taiidan"],
         "cost":1,
         "medals":1,
-        "restriction":"assault-frigate"
+        "classAssignment":["assault-frigate"]
     },
     {
         "name":"hangar-bay",
-        "classAssignment":["super-capital","frigate"],
+        "classAssignment":["super-capital"],
         "faction":["kushan", "taiidan"],
         "cost":1,
         "medals":1,
-        "restriction":"super-capital",
         "slots":[
             {
                 "class":"fighter",
@@ -67,7 +66,7 @@
         "faction":["kushan", "taiidan"],
         "cost":2,
         "medals":2,
-        "restriction":"super-capital",
+        "classAssignment":["super-capital"],
         "slots":[
             {
                 "class":"fighter",
@@ -81,98 +80,86 @@
     },
     {
         "name":"advanced-point-defence",
+        "classAssignment":["super-capital"],
         "faction":["kushan"],
         "cost":1,
-        "medals":1,
-        "restriction":"super-capital"
-    },
-    {
-        "name":"seeker",
-        "cost":1,
-        "restriction":"corvette"
+        "medals":1
     },
     {
         "name":"cruise-missiles",
+        "classAssignment":["carrier"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"carrier"
+        "medals":1
     },
     {
         "name":"upgraded-thrusters",
+        "classAssignment":["salvage-corvette"],
         "faction":["kushan"],
         "cost":1,
-        "medals":1,
-        "restriction":"salvage-corvette"
+        "medals":1
     },
     {
         "name":"rammer",
+        "classAssignment":["light-corvette"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"light-corvette"
+        "medals":1
     },
     {
         "name":"prow-ram",
+        "classAssignment":["super-capital"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"super-capital"
+        "medals":1
     },
     {
         "name":"med-bays",
         "classAssignment":["frigate","station","super-capital"],
         "faction":["kushan"],
         "cost":1,
-        "medals":1,
-        "restriction":"frigate"
+        "medals":1
     },
     {
         "name":"hull-defense-guns",
         "classAssignment":["mothership"],
         "faction":["kushan"],
         "cost":1,
-        "medals":1,
-        "restriction":"mothership"
+        "medals":1
     },
     {
         "name":"security-stations",
         "classAssignment":["super-capital"],
         "faction":["kushan"],
         "cost":1,
-        "medals":1,
-        "restriction":"super-capital"
+        "medals":1
     },
     {
         "name":"precision-focus",
         "classAssignment":["ion-cannon-frigate"],
         "faction":["kushan"],
         "cost":2,
-        "medals":1,
-        "restriction":"ion-cannon-frigate"
+        "medals":1
     },
     {
         "name":"automated-repairs",
         "classAssignment":["super-capital"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"super-capital"
+        "medals":1
     },
     {
         "name":"marines",
         "classAssignment":["super-capital"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"super-capital"
+        "medals":1
     },
     {
         "name":"tritium-injection",
         "classAssignment":["frigate","super-capital"],
         "faction":["taiidan"],
         "cost":1,
-        "medals":1,
-        "restriction":"frigate"
+        "medals":1
     }
 ]
