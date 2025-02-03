@@ -1249,6 +1249,7 @@ function setupOptions(){
     }
 
     var leaderSection = document.getElementById("addLeaderSection")
+    leaderSection.innerHTML = "";
     var leaderLabel = document.createElement("span");
     leaderLabel.innerHTML = "Leaders:";
     leaderSection.appendChild(leaderLabel);
@@ -1270,6 +1271,7 @@ function setupOptions(){
     leaderSection.appendChild(leaderAddButton);
 
     var unitSection = document.getElementById("addUnitSection")
+    unitSection.innerHTML = "";
     var unitLabel = document.createElement("span");
     unitLabel.innerHTML = "Units:";
     unitSection.appendChild(unitLabel);
@@ -1291,6 +1293,7 @@ function setupOptions(){
     unitSection.appendChild(unitAddButton);
 
     var planetSection = document.getElementById("addPlanetSection");
+    planetSection.innerHTML = "";
     var planetLabel = document.createElement("span");
     planetLabel.innerHTML = "Planets:";
     planetSection.appendChild(planetLabel);
