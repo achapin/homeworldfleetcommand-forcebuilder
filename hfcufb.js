@@ -94,7 +94,9 @@ function loadForce(forceName) {
     force.faction = forceJson.faction;
     factionSelection.value = force.faction;
     contentCampaign.checked = forceJson.useCampaign;
+    force.useCampaign = forceJson.useCampaign;
     contentScout.checked = forceJson.useScout;
+    force.useScout = forceJson.useScout;
     setupOptions();
     updateForce();
 }
@@ -1241,6 +1243,10 @@ function setupOptions(){
             var option = new Option(displayText[faction], faction);
             factionSelection.add(option);
         });
+    }
+
+    if(force.hasOwnProperty("faction")){
+        factionSelection.value = force.faction;
     }
 
     factionSelection.onchange = function() {
