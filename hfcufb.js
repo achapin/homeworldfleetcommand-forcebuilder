@@ -94,7 +94,9 @@ function loadForce(forceName) {
     force.faction = forceJson.faction;
     factionSelection.value = force.faction;
     contentCampaign.checked = forceJson.useCampaign;
+    force.useCampaign = forceJson.useCampaign;
     contentScout.checked = forceJson.useScout;
+    force.useScout = forceJson.useScout;
     setupOptions();
     updateForce();
 }
@@ -1243,12 +1245,17 @@ function setupOptions(){
         });
     }
 
+    if(force.hasOwnProperty("faction")){
+        factionSelection.value = force.faction;
+    }
+
     factionSelection.onchange = function() {
         force.faction = factionSelection.value;
         updateForce();
     }
 
     var leaderSection = document.getElementById("addLeaderSection")
+    leaderSection.innerHTML = "";
     var leaderLabel = document.createElement("span");
     leaderLabel.innerHTML = "Leaders:";
     leaderSection.appendChild(leaderLabel);
@@ -1270,6 +1277,7 @@ function setupOptions(){
     leaderSection.appendChild(leaderAddButton);
 
     var unitSection = document.getElementById("addUnitSection")
+    unitSection.innerHTML = "";
     var unitLabel = document.createElement("span");
     unitLabel.innerHTML = "Units:";
     unitSection.appendChild(unitLabel);
@@ -1291,6 +1299,7 @@ function setupOptions(){
     unitSection.appendChild(unitAddButton);
 
     var planetSection = document.getElementById("addPlanetSection");
+    planetSection.innerHTML = "";
     var planetLabel = document.createElement("span");
     planetLabel.innerHTML = "Planets:";
     planetSection.appendChild(planetLabel);

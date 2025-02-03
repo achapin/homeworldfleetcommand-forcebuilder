@@ -1,14 +1,5 @@
 [
     {
-        "name":"FAKEOUT",
-        "classAssignment":["fighter"],
-        "faction":["kushan", "taiidan"],
-        "cost":10,
-        "hand":1,
-        "play":1,
-        "source":"DUMMY"
-    },
-    {
         "name":"vice-admiral",
         "classAssignment":["super-capital"],
         "faction":["kushan","taiidan"],
