@@ -387,7 +387,7 @@
     },
     {
         "name":"bandit-interceptor",
-        "class":"corvette",
+        "class":"fighter",
         "faction":["turanic-raiders"],
         "cost":3,
         "source":"kickstarter-scout-box"
