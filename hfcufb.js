@@ -431,6 +431,19 @@ function renderLeader(leader, leaderSection){
     leaderPlayValue.innerHTML = leaderData.play;
     leaderContainer.appendChild(leaderPlayValue);
 
+    var leaderWarningDiv = document.createElement("div");
+
+    if(leaderData.faction.indexOf(force.faction) < 0){
+        var factionWarningdiv = document.createElement("span");
+        factionWarningdiv.innerHTML = "⚠ This Leader is not available for the " + displayText[force.faction] + " faction";
+        force.invalidations.push("Leaders are included in the force which are not allowed in the " + displayText[force.faction] + " faction");
+        leaderWarningDiv.appendChild(factionWarningdiv);
+    }
+
+    if(leaderWarningDiv.innerHTML.length > 0){
+        leaderContainer.appendChild(leaderWarningDiv);
+    }
+
     leaderSection.appendChild(leaderContainer);
 }
 
