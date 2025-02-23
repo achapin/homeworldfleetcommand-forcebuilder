@@ -178,7 +178,8 @@
         "name":"light-corvette",
         "class":"corvette",
         "faction":["kushan","taiidan"],
-        "cost":2
+        "cost":2,
+        "source":"base"
     },
     {
         "name":"missile-destroyer",
